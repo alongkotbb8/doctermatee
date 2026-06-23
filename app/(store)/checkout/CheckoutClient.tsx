@@ -31,7 +31,7 @@ export default function CheckoutClient({ user, profile }: Props) {
 
   const [couponCode, setCouponCode] = useState("");
   const [couponStatus, setCouponStatus] = useState<"idle" | "checking" | "valid" | "invalid">("idle");
-  const [couponData, setCouponData] = useState<{ discount_type: string; discount_value: number; id: string } | null>(null);
+  const [couponData, setCouponData] = useState<{ discount_type: string; discount_value: number; code: string } | null>(null);
   const [couponMsg, setCouponMsg] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
@@ -83,9 +83,9 @@ export default function CheckoutClient({ user, profile }: Props) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        items: items.map((i) => ({ product_id: i.id, qty: i.qty, price: i.price })),
+        items: items.map((i) => ({ product_id: i.id, name: i.name, qty: i.qty, price: i.price })),
         shipping_address: { full_name: fullName, phone, email, address, district, province, postal_code: postalCode },
-        coupon_id: couponData?.id ?? null,
+        coupon_code: couponData?.code ?? null,
         subtotal, shipping, discount, total,
       }),
     });

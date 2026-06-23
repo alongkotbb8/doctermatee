@@ -10,7 +10,7 @@ function generateOrderNo(): string {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { items, shipping_address, coupon_id, subtotal, shipping, discount, total } = body;
+  const { items, shipping_address, coupon_code, subtotal, shipping, discount, total } = body;
 
   if (!items?.length || !shipping_address || total == null) {
     return NextResponse.json({ error: "ข้อมูลไม่ครบถ้วน" }, { status: 400 });
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
       status: "pending",
       payment_status: "unpaid",
       shipping_address,
-      coupon_id: coupon_id ?? null,
+      coupon_code: coupon_code ?? null,
       subtotal,
       shipping_fee: shipping,
       discount,
@@ -61,9 +61,10 @@ export async function POST(req: NextRequest) {
   }
 
   // Create order items
-  const orderItems = items.map((i: { product_id: string; qty: number; price: number }) => ({
+  const orderItems = items.map((i: { product_id: string; name: string; qty: number; price: number }) => ({
     order_id: order.id,
     product_id: i.product_id,
+    name: i.name,
     qty: i.qty,
     price: i.price,
   }));
@@ -75,8 +76,11 @@ export async function POST(req: NextRequest) {
   }
 
   // Increment coupon usage
-  if (coupon_id) {
-    await service.rpc("increment_coupon_use", { coupon_id });
+  if (coupon_code) {
+    const { data: cur } = await service.from("coupons").select("used_count").eq("code", coupon_code).single();
+    if (cur) {
+      await service.from("coupons").update({ used_count: cur.used_count + 1 }).eq("code", coupon_code);
+    }
   }
 
   return NextResponse.json({ order_id: order.id });
