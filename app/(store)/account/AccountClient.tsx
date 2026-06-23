@@ -23,6 +23,7 @@ interface Props {
 export default function AccountClient({ user, profile, orders }: Props) {
   const router = useRouter();
   const [tab, setTab] = useState<"profile" | "address" | "orders">("profile");
+  const [showVerified, setShowVerified] = useState(typeof window !== "undefined" && new URLSearchParams(window.location.search).get("verified") === "1");
   const [fullName, setFullName] = useState(profile?.full_name ?? "");
   const [phone, setPhone] = useState(profile?.phone ?? "");
   const [saving, setSaving] = useState(false);
@@ -68,6 +69,12 @@ export default function AccountClient({ user, profile, orders }: Props) {
   return (
     <div style={{ padding: "36px 0 64px" }}>
       <div className="wrap" style={{ maxWidth: 760 }}>
+        {showVerified && (
+          <div className="anim-fade-up" style={{ background: "#D1FAE5", border: "1px solid #6EE7B7", borderRadius: "var(--radius-md)", padding: "14px 18px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <p style={{ margin: 0, fontSize: 14, color: "#065F46", fontWeight: 600 }}>✓ ยืนยันอีเมลสำเร็จแล้ว ยินดีต้อนรับสู่ Doctermatee!</p>
+            <button onClick={() => setShowVerified(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#065F46", fontSize: 18, lineHeight: 1 }}>×</button>
+          </div>
+        )}
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
