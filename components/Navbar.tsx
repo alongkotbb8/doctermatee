@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { IconSearch, IconUser, IconMenu, IconStethoscope, IconPlus, IconX } from "./icons";
 import CartIcon from "./CartIcon";
@@ -15,11 +15,20 @@ const LINKS = [
 
 export default function Navbar() {
   const path = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [q, setQ] = useState("");
 
   // ปิดเมนูเมื่อเปลี่ยนหน้า
   useEffect(() => { setOpen(false); }, [path]);
+
+  function submitSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const term = q.trim();
+    setOpen(false);
+    router.push(term ? `/products?q=${encodeURIComponent(term)}` : "/products");
+  }
 
   // liquid glass เมื่อเลื่อนหน้าลง
   useEffect(() => {
@@ -73,12 +82,12 @@ export default function Navbar() {
         </nav>
 
         {/* Search */}
-        <div className="nav-search" style={{ flex: 1, display: "flex", alignItems: "center", background: "var(--neutral-50)", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-full)", padding: "0 6px 0 16px", height: 42, minWidth: 0, maxWidth: 340, marginLeft: "auto" }}>
-          <input type="text" placeholder="ค้นหาสินค้า…" style={{ flex: 1, minWidth: 0, border: "none", background: "none", outline: "none", fontFamily: "var(--font-body)", fontSize: 14, color: "var(--neutral-900)" }} />
-          <button aria-label="ค้นหา" style={{ width: 32, height: 32, border: "none", borderRadius: "50%", background: "var(--color-primary)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <form className="nav-search" onSubmit={submitSearch} style={{ flex: 1, display: "flex", alignItems: "center", background: "var(--neutral-50)", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-full)", padding: "0 6px 0 16px", height: 42, minWidth: 0, maxWidth: 340, marginLeft: "auto" }}>
+          <input type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาสินค้า…" style={{ flex: 1, minWidth: 0, border: "none", background: "none", outline: "none", fontFamily: "var(--font-body)", fontSize: 14, color: "var(--neutral-900)" }} />
+          <button type="submit" aria-label="ค้นหา" style={{ width: 32, height: 32, border: "none", borderRadius: "50%", background: "var(--color-primary)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <IconSearch size={15} color="#fff" />
           </button>
-        </div>
+        </form>
 
         {/* Account + Cart */}
         <div style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
@@ -97,12 +106,12 @@ export default function Navbar() {
       {/* Mobile drawer */}
       {open && (
         <div className="nav-drawer anim-fade-up" style={{ borderTop: "1px solid var(--neutral-100)", background: "#fff", padding: "12px 24px 18px", display: "flex", flexDirection: "column", gap: 4 }}>
-          <div style={{ display: "flex", alignItems: "center", background: "var(--neutral-50)", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-full)", padding: "0 6px 0 16px", height: 44, marginBottom: 8 }}>
-            <input type="text" placeholder="ค้นหาสินค้า…" style={{ flex: 1, minWidth: 0, border: "none", background: "none", outline: "none", fontFamily: "var(--font-body)", fontSize: 14 }} />
-            <button aria-label="ค้นหา" style={{ width: 32, height: 32, border: "none", borderRadius: "50%", background: "var(--color-primary)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <form onSubmit={submitSearch} style={{ display: "flex", alignItems: "center", background: "var(--neutral-50)", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-full)", padding: "0 6px 0 16px", height: 44, marginBottom: 8 }}>
+            <input type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาสินค้า…" style={{ flex: 1, minWidth: 0, border: "none", background: "none", outline: "none", fontFamily: "var(--font-body)", fontSize: 14 }} />
+            <button type="submit" aria-label="ค้นหา" style={{ width: 32, height: 32, border: "none", borderRadius: "50%", background: "var(--color-primary)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <IconSearch size={15} color="#fff" />
             </button>
-          </div>
+          </form>
           {LINKS.map((l) => (
             <Link key={l.href} href={l.href} style={{
               fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15,

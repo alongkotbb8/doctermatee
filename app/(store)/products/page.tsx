@@ -4,25 +4,35 @@ import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/lib/types";
 
 interface Props {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; q?: string }>;
 }
 
 export default async function ProductsPage({ searchParams }: Props) {
-  const { category } = await searchParams;
+  const { category, q } = await searchParams;
+  const term = (q ?? "").trim().toLowerCase();
 
   const [allProducts, categories] = await Promise.all([getActiveProducts(), getCategories()]);
 
-  // กรองตามหมวดในหน่วยความจำ (ข้อมูล cache แล้ว — ไม่ยิง DB ต่อคำขอ)
-  const products = category
+  // กรองตามหมวด + คำค้นหา ในหน่วยความจำ (ข้อมูล cache แล้ว — ไม่ยิง DB ต่อคำขอ)
+  let products = category
     ? allProducts.filter((p) => (p.categories as { slug?: string } | null)?.slug === category)
     : allProducts;
+  if (term) {
+    products = products.filter((p) =>
+      p.name.toLowerCase().includes(term) ||
+      (p.description ?? "").toLowerCase().includes(term) ||
+      (p.categories?.name ?? "").toLowerCase().includes(term)
+    );
+  }
+
+  const heading = term ? `ผลการค้นหา “${q}”` : "สินค้าทั้งหมด";
 
   return (
     <div style={{ padding: "32px 0 64px" }}>
       <div className="wrap">
         {/* Header */}
         <div style={{ marginBottom: 28 }}>
-          <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 32, letterSpacing: "-.02em", color: "var(--neutral-900)" }}>สินค้าทั้งหมด</h1>
+          <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 32, letterSpacing: "-.02em", color: "var(--neutral-900)" }}>{heading}</h1>
           <p style={{ color: "var(--neutral-500)", marginTop: 4 }}>พบ {products?.length ?? 0} รายการ</p>
         </div>
 
