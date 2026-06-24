@@ -18,10 +18,10 @@ export default function AdminSidebar() {
   const path = usePathname();
 
   return (
-    <aside style={{ width: 230, background: "linear-gradient(180deg,#0F172A 0%,#1E293B 100%)", padding: "0 0 16px", display: "flex", flexDirection: "column", flexShrink: 0 }}>
+    <aside className="admin-aside" style={{ width: 230, background: "linear-gradient(180deg,#0F172A 0%,#1E293B 100%)", padding: "0 0 16px", display: "flex", flexDirection: "column", flexShrink: 0 }}>
 
       {/* Logo */}
-      <div style={{ padding: "20px 18px 18px", borderBottom: "1px solid rgba(255,255,255,.08)", marginBottom: 8 }}>
+      <div className="admin-logo" style={{ padding: "20px 18px 18px", borderBottom: "1px solid rgba(255,255,255,.08)", marginBottom: 8 }}>
         <Link href="/admin" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg,var(--teal-500),var(--teal-700))", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(20,184,166,.4)" }}>
             <IconPlus size={17} color="#fff" />
@@ -34,7 +34,7 @@ export default function AdminSidebar() {
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: "4px 10px", display: "flex", flexDirection: "column", gap: 1 }}>
+      <nav className="admin-nav" style={{ flex: 1, padding: "4px 10px", display: "flex", flexDirection: "column", gap: 1 }}>
         {NAV.map((item) => {
           const active = item.href === "/admin" ? path === "/admin" : path.startsWith(item.href);
           return (
@@ -56,7 +56,7 @@ export default function AdminSidebar() {
       </nav>
 
       {/* Bottom — ดูหน้าร้าน */}
-      <div style={{ padding: "10px 10px 0", borderTop: "1px solid rgba(255,255,255,.08)", marginTop: 8 }}>
+      <div className="admin-bottom" style={{ padding: "10px 10px 0", borderTop: "1px solid rgba(255,255,255,.08)", marginTop: 8 }}>
         <a href="/" target="_blank" rel="noopener noreferrer" style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
           gap: 8, padding: "11px 14px", borderRadius: 10, textDecoration: "none",

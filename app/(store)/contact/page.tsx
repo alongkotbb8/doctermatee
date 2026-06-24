@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { IconPhone, IconMail, IconClock, IconStethoscope } from "@/components/icons";
+import ContactForm from "./ContactForm";
 
 export const metadata: Metadata = {
   title: "ติดต่อเรา / ปรึกษาแพทย์",
@@ -36,7 +37,7 @@ export default async function ContactPage() {
           </p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 18 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 18, marginBottom: 40 }}>
           {items.map((it) => (
             <div key={it.label} className="card" style={{ padding: "26px 20px", textAlign: "center" }}>
               <div style={{ width: 52, height: 52, borderRadius: "50%", background: "var(--teal-50)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}>{it.icon}</div>
@@ -49,6 +50,9 @@ export default async function ContactPage() {
             </div>
           ))}
         </div>
+
+        <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 20, color: "var(--neutral-900)", marginBottom: 16, textAlign: "center" }}>ส่งข้อความถึงเรา</h2>
+        <ContactForm />
       </div>
       <style>{`@media(max-width:768px){div[style*="repeat(3"]{grid-template-columns:1fr!important}}`}</style>
     </div>

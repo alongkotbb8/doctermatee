@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getShippingConfig } from "@/lib/shipping";
 import CheckoutClient from "./CheckoutClient";
 
 export const metadata = { title: "ชำระเงิน" };
@@ -6,6 +7,7 @@ export const metadata = { title: "ชำระเงิน" };
 export default async function CheckoutPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const { freeThreshold, standardFee } = await getShippingConfig();
 
   let profile = null;
   if (user) {
@@ -17,5 +19,5 @@ export default async function CheckoutPage() {
     profile = data;
   }
 
-  return <CheckoutClient user={user} profile={profile} />;
+  return <CheckoutClient user={user} profile={profile} freeThreshold={freeThreshold} standardFee={standardFee} />;
 }

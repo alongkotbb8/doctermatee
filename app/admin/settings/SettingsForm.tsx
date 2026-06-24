@@ -68,7 +68,7 @@ export default function SettingsForm({ contact, shipping, hero }: Props) {
             <div><label style={lbl}>ส่งฟรีเมื่อซื้อครบ (฿)</label><input type="number" value={freeThreshold} onChange={(e) => setFreeThreshold(e.target.value)} style={inp} /></div>
             <div><label style={lbl}>ค่าจัดส่งมาตรฐาน (฿)</label><input type="number" value={standardFee} onChange={(e) => setStandardFee(e.target.value)} style={inp} /></div>
           </div>
-          <p style={{ fontSize: 12, color: "var(--neutral-400)", margin: 0 }}>หมายเหตุ: ค่าจัดส่งในหน้าตะกร้า/ชำระเงินใช้ค่า 500/50 — หากต้องการให้ค่าตรงนี้มีผล แจ้งทีมพัฒนาให้เชื่อมค่าจาก site_settings</p>
+          <p style={{ fontSize: 12, color: "var(--neutral-400)", margin: 0 }}>ค่านี้มีผลกับหน้าตะกร้าและหน้าชำระเงินทันทีหลังบันทึก</p>
         </div>
 
         <div className="card" style={card}>

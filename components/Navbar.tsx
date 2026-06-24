@@ -11,7 +11,7 @@ export default function Navbar() {
   return (
     <>
       {/* Top bar */}
-      <div style={{ background: "var(--teal-800)", color: "#CFFAEE", fontSize: 13 }}>
+      <div className="nav-topbar" style={{ background: "var(--teal-800)", color: "#CFFAEE", fontSize: 13 }}>
         <div className="wrap" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 38, gap: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
             <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -38,7 +38,7 @@ export default function Navbar() {
             Doctermatee
           </Link>
 
-          <div style={{ flex: 1, display: "flex", alignItems: "center", background: "var(--neutral-50)", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-full)", padding: "0 8px 0 18px", height: 46, maxWidth: 520 }}>
+          <div className="nav-search" style={{ flex: 1, display: "flex", alignItems: "center", background: "var(--neutral-50)", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-full)", padding: "0 8px 0 18px", height: 46, maxWidth: 520 }}>
             <input type="text" placeholder="ค้นหาวิตามิน อาหารเสริม หรือยา…" style={{ flex: 1, border: "none", background: "none", outline: "none", fontFamily: "var(--font-body)", fontSize: 15, color: "var(--neutral-900)" }} />
             <button style={{ width: 34, height: 34, border: "none", borderRadius: "50%", background: "var(--color-primary)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <IconSearch size={16} color="#fff" />
@@ -55,7 +55,7 @@ export default function Navbar() {
       </header>
 
       {/* Nav */}
-      <nav style={{ background: "#fff", borderBottom: "1px solid var(--neutral-100)", position: "sticky", top: 0, zIndex: 30 }}>
+      <nav className="nav-menu" style={{ background: "#fff", borderBottom: "1px solid var(--neutral-100)", position: "sticky", top: 0, zIndex: 30 }}>
         <div className="wrap" style={{ display: "flex", alignItems: "center", gap: 8, height: 52 }}>
           <Link href="/products" style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--color-primary)", color: "#fff", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, padding: "10px 18px", borderRadius: "var(--radius-full)", textDecoration: "none" }}>
             <IconMenu size={16} color="#fff" /> หมวดหมู่สินค้า
@@ -78,7 +78,7 @@ export default function Navbar() {
               </Link>
             ))}
           </div>
-          <Link href="/contact" style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 7, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "var(--teal-700)", textDecoration: "none" }}>
+          <Link href="/contact" className="nav-consult" style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 7, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "var(--teal-700)", textDecoration: "none", paddingRight: 4 }}>
             <IconStethoscope size={18} color="var(--teal-700)" /> ปรึกษาแพทย์
           </Link>
         </div>

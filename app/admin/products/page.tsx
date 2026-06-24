@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import Image from "next/image";
-import { IconPlus, IconEdit } from "@/components/icons";
+import { IconPlus, IconEdit, IconPill } from "@/components/icons";
 
 export default async function AdminProducts() {
   const supabase = await createClient();
@@ -36,7 +36,7 @@ export default async function AdminProducts() {
                     <div style={{ width: 44, height: 44, borderRadius: 8, overflow: "hidden", background: "var(--neutral-100)", flexShrink: 0, position: "relative" }}>
                       {p.images?.[0]
                         ? <Image src={p.images[0]} alt={p.name} fill style={{ objectFit: "cover" }} sizes="44px" />
-                        : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>💊</div>}
+                        : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><IconPill size={20} color="var(--teal-400)" /></div>}
                     </div>
                     <span style={{ fontSize: 14, fontWeight: 600, color: "var(--neutral-800)" }}>{p.name}</span>
                   </div>

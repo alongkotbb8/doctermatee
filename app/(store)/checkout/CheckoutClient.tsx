@@ -4,21 +4,22 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { useCart } from "@/store/cart";
-import { IconTag, IconTruck, IconUser, IconPhone, IconMail, IconShield } from "@/components/icons";
+import { IconTag, IconTruck, IconUser, IconPhone, IconMail, IconShield, IconPill } from "@/components/icons";
 import Link from "next/link";
 import Image from "next/image";
-
-const SHIPPING_FEE = 50;
-const FREE_SHIPPING_AT = 500;
 
 interface Props {
   user: User | null;
   profile: { full_name: string | null; phone: string | null; default_address: Record<string, string> | null } | null;
+  freeThreshold?: number;
+  standardFee?: number;
 }
 
-export default function CheckoutClient({ user, profile }: Props) {
+export default function CheckoutClient({ user, profile, freeThreshold = 500, standardFee = 50 }: Props) {
   const router = useRouter();
   const { items, totalPrice } = useCart();
+  const SHIPPING_FEE = standardFee;
+  const FREE_SHIPPING_AT = freeThreshold;
   const placedRef = useRef(false);
 
   const addr = profile?.default_address ?? {};
@@ -260,7 +261,7 @@ export default function CheckoutClient({ user, profile }: Props) {
                       {item.image ? (
                         <Image src={item.image} alt={item.name} fill style={{ objectFit: "cover" }} sizes="52px" />
                       ) : (
-                        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>💊</div>
+                        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><IconPill size={22} color="var(--teal-400)" /></div>
                       )}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>

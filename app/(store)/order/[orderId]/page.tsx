@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import Image from "next/image";
-import { IconCheck, IconTruck, IconPackage, IconArrowRight } from "@/components/icons";
+import { IconCheck, IconTruck, IconPackage, IconArrowRight, IconPill } from "@/components/icons";
 
 export const metadata = { title: "ยืนยันออเดอร์ — Doctermatee" };
 
@@ -89,7 +89,7 @@ export default async function OrderPage({ params, searchParams }: {
                   {item.products?.images?.[0] ? (
                     <Image src={item.products.images[0]} alt={item.products.name} fill style={{ objectFit: "cover" }} sizes="56px" />
                   ) : (
-                    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>💊</div>
+                    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><IconPill size={24} color="var(--teal-400)" /></div>
                   )}
                 </div>
                 <div style={{ flex: 1 }}>

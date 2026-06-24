@@ -282,3 +282,64 @@ img { max-width: 100%; display: block; }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* ============================================================
+   Responsive — global grid collapse for inline-styled layouts
+   (ลำดับ breakpoint จากใหญ่ไปเล็ก เพื่อให้จอเล็กชนะ)
+   ============================================================ */
+
+/* Tablet: ยุบ 2-คอลัมน์แบบไม่เท่ากัน (sidebar+เนื้อหา, ตะกร้า, ชำระเงิน, ฟอร์มแอดมิน) */
+@media (max-width: 1024px) {
+  [style*="320px 1fr"],
+  [style*="220px 1fr"],
+  [style*="1fr 380px"],
+  [style*="1fr 340px"],
+  [style*="1fr 300px"],
+  [style*="1fr 280px"] { grid-template-columns: 1fr !important; }
+}
+
+/* Tablet เล็ก: grid 3 คอลัมน์ → 2, หมวดหมู่ 5 → 3, footer 4 → 2 */
+@media (max-width: 860px) {
+  [style*="repeat(3,1fr)"],
+  [style*="repeat(3, 1fr)"] { grid-template-columns: repeat(2, 1fr) !important; }
+  [style*="repeat(5,1fr)"] { grid-template-columns: repeat(3, 1fr) !important; }
+  [style*="1.4fr 1fr 1fr 1.2fr"] { grid-template-columns: repeat(2, 1fr) !important; }
+  .wrap { padding-left: 16px !important; padding-right: 16px !important; }
+  /* ตารางแอดมินเลื่อนแนวนอนได้ */
+  .card > table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+
+/* มือถือใหญ่: ยุบ hero / ฟอร์มคู่ 1fr 1fr และราคา 3 ช่อง → 1 คอลัมน์ */
+@media (max-width: 768px) {
+  [style*="1fr 1fr"] { grid-template-columns: 1fr !important; }
+}
+
+/* มือถือ: grid 3 → 1, หมวดหมู่ 5 → 2, footer → 1 */
+@media (max-width: 560px) {
+  [style*="repeat(3,1fr)"],
+  [style*="repeat(3, 1fr)"] { grid-template-columns: 1fr !important; }
+  [style*="repeat(5,1fr)"] { grid-template-columns: repeat(2, 1fr) !important; }
+  [style*="1.4fr 1fr 1fr 1.2fr"] { grid-template-columns: 1fr !important; }
+}
+
+/* ── Navbar responsive ─────────────────────────────────── */
+@media (max-width: 768px) {
+  .nav-topbar { display: none !important; }
+  .nav-search { display: none !important; }
+  .nav-menu { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .nav-menu::-webkit-scrollbar { display: none; }
+  .nav-menu > div { flex-wrap: nowrap !important; }
+  .nav-menu a, .nav-menu .nav-consult { white-space: nowrap; }
+}
+
+/* ── Admin responsive ──────────────────────────────────── */
+@media (max-width: 860px) {
+  .admin-shell { flex-direction: column !important; }
+  .admin-aside { width: 100% !important; flex-direction: row !important; align-items: center; overflow-x: auto; gap: 4px; padding: 8px 10px !important; }
+  .admin-aside .admin-logo { border-bottom: none !important; margin-bottom: 0 !important; padding: 0 8px 0 0 !important; flex-shrink: 0; }
+  .admin-nav { flex-direction: row !important; flex: 1; overflow-x: auto; gap: 4px !important; padding: 0 !important; scrollbar-width: none; }
+  .admin-nav::-webkit-scrollbar { display: none; }
+  .admin-nav a { white-space: nowrap; border-left: none !important; }
+  .admin-bottom { display: none !important; }
+  .admin-main { padding: 20px 16px !important; }
+}

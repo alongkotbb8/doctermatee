@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import AddToCartButton from "@/components/AddToCartButton";
+import { IconPill, IconFlask, IconSparkles, IconBaby, IconHeartPulse, IconLeaf } from "@/components/icons";
 import type { Metadata } from "next";
 
 interface Props {
@@ -13,11 +14,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = await createClient();
   const { data } = await supabase.from("products").select("name, description").eq("slug", slug).single();
   if (!data) return { title: "ไม่พบสินค้า" };
-  return { title: `${data.name} — Doctermatee`, description: data.description ?? undefined };
+  return { title: data.name, description: data.description ?? undefined };
 }
 
-const ICONS: Record<string, string> = {
-  vitamins: "💊", supplements: "🧴", beauty: "✨", "mother-and-child": "👶", "medical-devices": "🩺",
+const CAT_ICONS: Record<string, React.ReactNode> = {
+  vitamins: <IconPill size={96} color="var(--teal-400)" />,
+  supplements: <IconFlask size={96} color="var(--teal-400)" />,
+  beauty: <IconSparkles size={96} color="var(--teal-400)" />,
+  "mother-and-child": <IconBaby size={96} color="var(--teal-400)" />,
+  "medical-devices": <IconHeartPulse size={96} color="var(--teal-400)" />,
 };
 
 export default async function ProductDetailPage({ params }: Props) {
@@ -39,7 +44,7 @@ export default async function ProductDetailPage({ params }: Props) {
       : null;
 
   const catSlug = (product.categories as { slug: string } | null)?.slug ?? "";
-  const icon = ICONS[catSlug] ?? "🌿";
+  const icon = CAT_ICONS[catSlug] ?? <IconLeaf size={96} color="var(--teal-400)" />;
 
   return (
     <div style={{ padding: "32px 0 64px" }}>
@@ -55,12 +60,12 @@ export default async function ProductDetailPage({ params }: Props) {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}>
           {/* Image */}
-          <div style={{ background: "var(--green-50)", borderRadius: "var(--radius-lg)", height: 420, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 120, border: "1px solid var(--neutral-200)" }}>
+          <div style={{ background: "var(--green-50)", borderRadius: "var(--radius-lg)", height: 420, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--neutral-200)" }}>
             {product.images[0] ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={product.images[0]} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "var(--radius-lg)" }} />
             ) : (
-              <span>{icon}</span>
+              <span style={{ opacity: 0.8 }}>{icon}</span>
             )}
           </div>
 

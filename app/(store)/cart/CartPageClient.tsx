@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCart, type CartItem } from "@/store/cart";
-import { IconCart, IconFlask, IconPill, IconTag, IconArrowRight, IconTruck, IconShield } from "@/components/icons";
+import { IconCart, IconFlask, IconPill, IconTag, IconArrowRight, IconTruck, IconShield, IconTrash, IconMinus, IconPlus } from "@/components/icons";
 
 const FALLBACK_ICONS: Record<string, React.ReactNode> = {
   วิตามิน: <IconPill size={36} color="var(--teal-400)" />,
@@ -17,33 +17,35 @@ function QtyControl({ item }: { item: CartItem }) {
     <div style={{ display: "flex", alignItems: "center", gap: 0, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-full)", overflow: "hidden", height: 36 }}>
       <button
         onClick={() => updateQty(item.id, item.qty - 1)}
-        style={{ width: 36, height: 36, border: "none", background: "none", cursor: "pointer", fontSize: 18, color: "var(--neutral-600)", display: "flex", alignItems: "center", justifyContent: "center", transition: "background .15s" }}
+        aria-label={item.qty === 1 ? "ลบสินค้า" : "ลดจำนวน"}
+        style={{ width: 36, height: 36, border: "none", background: "none", cursor: "pointer", color: item.qty === 1 ? "#EF4444" : "var(--neutral-600)", display: "flex", alignItems: "center", justifyContent: "center", transition: "background .15s" }}
         onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "var(--neutral-100)")}
         onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "none")}
       >
-        {item.qty === 1 ? "🗑" : "−"}
+        {item.qty === 1 ? <IconTrash size={15} color="currentColor" /> : <IconMinus size={16} color="currentColor" />}
       </button>
       <span style={{ minWidth: 32, textAlign: "center", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15 }}>{item.qty}</span>
       <button
         onClick={() => updateQty(item.id, item.qty + 1)}
         disabled={item.qty >= item.stock}
-        style={{ width: 36, height: 36, border: "none", background: "none", cursor: item.qty >= item.stock ? "not-allowed" : "pointer", fontSize: 18, color: item.qty >= item.stock ? "var(--neutral-300)" : "var(--neutral-600)", display: "flex", alignItems: "center", justifyContent: "center", transition: "background .15s" }}
+        aria-label="เพิ่มจำนวน"
+        style={{ width: 36, height: 36, border: "none", background: "none", cursor: item.qty >= item.stock ? "not-allowed" : "pointer", color: item.qty >= item.stock ? "var(--neutral-300)" : "var(--neutral-600)", display: "flex", alignItems: "center", justifyContent: "center", transition: "background .15s" }}
         onMouseEnter={(e) => { if (item.qty < item.stock) (e.currentTarget as HTMLButtonElement).style.background = "var(--neutral-100)"; }}
         onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "none")}
       >
-        +
+        <IconPlus size={15} color="currentColor" />
       </button>
     </div>
   );
 }
 
-export default function CartPageClient() {
+export default function CartPageClient({ freeThreshold = 500, standardFee = 50 }: { freeThreshold?: number; standardFee?: number }) {
   const items = useCart((s) => s.items);
   const clearCart = useCart((s) => s.clearCart);
   const totalItems = useCart((s) => s.totalItems());
   const totalPrice = useCart((s) => s.totalPrice());
 
-  const shippingFee = totalPrice >= 500 ? 0 : 50;
+  const shippingFee = totalPrice >= freeThreshold ? 0 : standardFee;
   const grandTotal = totalPrice + shippingFee;
 
   if (items.length === 0) {
@@ -149,7 +151,7 @@ export default function CartPageClient() {
                 {shippingFee > 0 && (
                   <div style={{ background: "var(--green-50)", borderRadius: "var(--radius-sm)", padding: "10px 12px", fontSize: 12, color: "var(--teal-700)", display: "flex", alignItems: "center", gap: 6 }}>
                     <IconTruck size={13} color="var(--teal-600)" />
-                    ซื้อเพิ่มอีก ฿{(500 - totalPrice).toLocaleString()} เพื่อรับส่งฟรี
+                    ซื้อเพิ่มอีก ฿{(freeThreshold - totalPrice).toLocaleString()} เพื่อรับส่งฟรี
                   </div>
                 )}
               </div>

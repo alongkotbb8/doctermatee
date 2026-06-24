@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { IconTruck, IconCheck, IconPackage, IconImage } from "@/components/icons";
+import { IconTruck, IconCheck, IconPackage, IconImage, IconPill } from "@/components/icons";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -78,7 +78,7 @@ export default function OrderDetailClient({ order }: { order: any }) {
                   <div style={{ width: 52, height: 52, borderRadius: 8, overflow: "hidden", background: "var(--neutral-100)", flexShrink: 0, position: "relative" }}>
                     {item.products?.images?.[0]
                       ? <Image src={item.products.images[0]} alt={item.products.name} fill style={{ objectFit: "cover" }} sizes="52px" />
-                      : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>💊</div>}
+                      : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><IconPill size={20} color="var(--teal-400)" /></div>}
                   </div>
                   <div style={{ flex: 1 }}>
                     <p style={{ fontSize: 14, fontWeight: 600, color: "var(--neutral-800)" }}>{item.products?.name}</p>
