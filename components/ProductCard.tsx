@@ -118,8 +118,8 @@ export default function ProductCard({ product }: { product: Product }) {
                 size="sm"
               />
             </div>
-            <button onClick={buyNow} disabled={soldOut}
-              style={{ flex: 1, background: soldOut ? "var(--neutral-300)" : "var(--neutral-900)", color: "#fff", border: "none", borderRadius: "var(--radius-full)", padding: "10px 0", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 12, cursor: soldOut ? "not-allowed" : "pointer", transition: "transform .15s var(--ease)" }}>
+            <button onClick={buyNow} disabled={soldOut} className={soldOut ? "" : "btn-pop"}
+              style={{ flex: 1, background: soldOut ? "var(--neutral-300)" : "var(--neutral-900)", color: "#fff", border: "none", borderRadius: "var(--radius-full)", padding: "10px 0", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 12, cursor: soldOut ? "not-allowed" : "pointer" }}>
               ซื้อเลย
             </button>
           </div>
