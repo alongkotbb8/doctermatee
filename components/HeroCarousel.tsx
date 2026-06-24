@@ -35,7 +35,7 @@ export default function HeroCarousel({ banners }: { banners: Banner[] }) {
     if (len <= 1) return;
     const t = setInterval(() => {
       if (!pausedRef.current) setI((p) => (p + 1) % len);
-    }, 5000);
+    }, 6500);
     return () => clearInterval(t);
   }, [len]);
 
@@ -50,7 +50,7 @@ export default function HeroCarousel({ banners }: { banners: Banner[] }) {
     >
       <div className="wrap grid-12" style={{ alignItems: "center", gap: 48, paddingTop: 60, paddingBottom: len > 1 ? 80 : 68 }}>
         {/* Left copy */}
-        <div className="col-7" key={`copy-${i}`} style={{ animation: "heroInLeft .6s var(--ease) both" }}>
+        <div className="col-7" key={`copy-${i}`} style={{ animation: "heroInLeft 1.1s cubic-bezier(.22,.61,.36,1) both" }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#fff", color: "var(--teal-700)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 12, padding: "6px 14px", borderRadius: "var(--radius-full)", boxShadow: "var(--shadow-sm)", marginBottom: 20 }}>
             <IconLeaf size={13} color="var(--teal-600)" /> สินค้าคุณภาพสูง มีเลข อย.
           </span>
@@ -79,7 +79,7 @@ export default function HeroCarousel({ banners }: { banners: Banner[] }) {
         </div>
 
         {/* Right visual */}
-        <div className="col-5" key={`vis-${i}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 340, position: "relative", animation: "heroInRight .6s var(--ease) both" }}>
+        <div className="col-5" key={`vis-${i}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 340, position: "relative", animation: "heroInRight .95s cubic-bezier(.22,.61,.36,1) both" }}>
           {b.image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={b.image} alt={b.title ?? "banner"} style={{ width: "100%", maxHeight: 380, objectFit: "contain", borderRadius: "var(--radius-lg)" }} />
