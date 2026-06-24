@@ -62,14 +62,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: charge.message }, { status: 400 });
     }
 
-    // Save payment event
+    // Save payment event (idempotent ด้วย omise_event_id)
     await service.from("payment_events").insert({
+      omise_event_id: charge.id,
       order_id,
-      provider: "omise",
-      event_type: "charge.create",
-      charge_id: charge.id,
-      amount: order.total,
-      status: charge.status,
+      type: "charge.create.promptpay",
       raw: charge,
     });
 
@@ -95,12 +92,9 @@ export async function POST(req: NextRequest) {
     }
 
     await service.from("payment_events").insert({
+      omise_event_id: charge.id,
       order_id,
-      provider: "omise",
-      event_type: "charge.create",
-      charge_id: charge.id,
-      amount: order.total,
-      status: charge.status,
+      type: "charge.create.card",
       raw: charge,
     });
 

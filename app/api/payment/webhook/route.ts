@@ -38,19 +38,22 @@ export async function POST(req: NextRequest) {
 
   const service = createServiceClient();
 
-  // Save payment event log
+  // Save payment event log (idempotent ด้วย event id ของ Omise)
   await service.from("payment_events").insert({
+    omise_event_id: body?.id ?? charge.id,
     order_id: orderId,
-    provider: "omise",
-    event_type: eventType,
-    charge_id: charge.id,
-    amount: charge.amount / 100,
-    status: charge.status,
+    type: eventType,
     raw: charge,
   });
 
   // Update order on successful payment
   if (charge.status === "successful") {
+    // ตรวจยอดเงินที่จ่ายจริงให้ตรงกับยอดออเดอร์ (กันการ mark paid ผิดยอด)
+    const { data: ord } = await service.from("orders").select("total").eq("id", orderId).single();
+    if (!ord || Math.round(Number(ord.total) * 100) !== charge.amount) {
+      return NextResponse.json({ ok: true, note: "amount mismatch" });
+    }
+
     const { data: updated } = await service
       .from("orders")
       .update({ payment_status: "paid", status: "paid" })
