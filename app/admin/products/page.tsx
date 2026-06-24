@@ -7,7 +7,7 @@ export default async function AdminProducts() {
   const supabase = await createClient();
   const { data: products } = await supabase
     .from("products")
-    .select("id, name, slug, price, stock, is_active, image_url, categories(name)")
+    .select("id, name, slug, price, stock, status, images, categories(name)")
     .order("created_at", { ascending: false });
 
   return (
@@ -34,8 +34,8 @@ export default async function AdminProducts() {
                 <td style={{ padding: "12px 16px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <div style={{ width: 44, height: 44, borderRadius: 8, overflow: "hidden", background: "var(--neutral-100)", flexShrink: 0, position: "relative" }}>
-                      {p.image_url
-                        ? <Image src={p.image_url} alt={p.name} fill style={{ objectFit: "cover" }} sizes="44px" />
+                      {p.images?.[0]
+                        ? <Image src={p.images[0]} alt={p.name} fill style={{ objectFit: "cover" }} sizes="44px" />
                         : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>💊</div>}
                     </div>
                     <span style={{ fontSize: 14, fontWeight: 600, color: "var(--neutral-800)" }}>{p.name}</span>
@@ -45,8 +45,8 @@ export default async function AdminProducts() {
                 <td style={{ padding: "12px 16px", fontSize: 14, fontWeight: 700, color: "var(--neutral-900)", fontFamily: "var(--font-display)" }}>฿{p.price.toLocaleString()}</td>
                 <td style={{ padding: "12px 16px", fontSize: 14, color: p.stock <= 5 ? "#EF4444" : "var(--neutral-700)", fontWeight: p.stock <= 5 ? 700 : 400 }}>{p.stock}</td>
                 <td style={{ padding: "12px 16px" }}>
-                  <span style={{ background: p.is_active ? "#D1FAE5" : "#F3F4F6", color: p.is_active ? "#065F46" : "#6B7280", borderRadius: "var(--radius-full)", padding: "3px 10px", fontSize: 12, fontWeight: 600 }}>
-                    {p.is_active ? "เผยแพร่" : "ซ่อน"}
+                  <span style={{ background: p.status === "active" ? "#D1FAE5" : "#F3F4F6", color: p.status === "active" ? "#065F46" : "#6B7280", borderRadius: "var(--radius-full)", padding: "3px 10px", fontSize: 12, fontWeight: 600 }}>
+                    {p.status === "active" ? "เผยแพร่" : "ซ่อน"}
                   </span>
                 </td>
                 <td style={{ padding: "12px 16px" }}>

@@ -7,7 +7,7 @@ export default async function PrintLabelPage({ params }: { params: Promise<{ id:
 
   const { data: order } = await supabase
     .from("orders")
-    .select("order_no, tracking_number, shipping_address, total, created_at, order_items(qty, products(name))")
+    .select("order_no, tracking_no, shipping_address, total, created_at, order_items(qty, products(name))")
     .eq("id", id)
     .single();
 
@@ -64,10 +64,10 @@ export default async function PrintLabelPage({ params }: { params: Promise<{ id:
         </div>
 
         {/* Tracking */}
-        {order.tracking_number && (
+        {order.tracking_no && (
           <div style={{ background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 6, padding: "10px 14px", marginBottom: 16 }}>
             <p style={{ margin: "0 0 4px", fontSize: 10, fontWeight: 700, color: "#065F46", textTransform: "uppercase", letterSpacing: ".08em" }}>เลขพัสดุ</p>
-            <p style={{ margin: 0, fontWeight: 800, fontSize: 18, letterSpacing: ".12em", color: "#065F46" }}>{order.tracking_number}</p>
+            <p style={{ margin: 0, fontWeight: 800, fontSize: 18, letterSpacing: ".12em", color: "#065F46" }}>{order.tracking_no}</p>
           </div>
         )}
 

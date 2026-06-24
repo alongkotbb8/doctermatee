@@ -39,7 +39,6 @@ function QtyControl({ item }: { item: CartItem }) {
 
 export default function CartPageClient() {
   const items = useCart((s) => s.items);
-  const removeItem = useCart((s) => s.removeItem);
   const clearCart = useCart((s) => s.clearCart);
   const totalItems = useCart((s) => s.totalItems());
   const totalPrice = useCart((s) => s.totalPrice());
@@ -121,12 +120,6 @@ export default function CartPageClient() {
                   <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, color: "var(--neutral-900)" }}>
                     ฿{(item.price * item.qty).toLocaleString()}
                   </div>
-                  <button
-                    onClick={() => removeItem(item.id)}
-                    style={{ background: "none", border: "none", color: "var(--neutral-400)", fontSize: 12, cursor: "pointer", marginTop: 4, fontFamily: "var(--font-body)" }}
-                  >
-                    ลบ
-                  </button>
                 </div>
               </div>
             ))}

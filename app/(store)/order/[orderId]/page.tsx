@@ -25,10 +25,10 @@ export default async function OrderPage({ params, searchParams }: {
     .from("orders")
     .select(`
       id, order_no, status, payment_status, total, subtotal, shipping_fee, discount,
-      shipping_address, tracking_number, created_at,
+      shipping_address, tracking_no, created_at,
       order_items (
         qty, price,
-        products ( name, image_url, slug )
+        products ( name, images, slug )
       )
     `)
     .eq("id", orderId)
@@ -70,11 +70,11 @@ export default async function OrderPage({ params, searchParams }: {
             </div>
           </div>
 
-          {order.tracking_number && (
+          {order.tracking_no && (
             <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px dashed var(--neutral-200)", display: "flex", alignItems: "center", gap: 8 }}>
               <IconTruck size={16} color="var(--teal-600)" />
               <span style={{ fontSize: 13, color: "var(--neutral-600)" }}>เลขพัสดุ:</span>
-              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14, color: "var(--teal-700)", letterSpacing: ".04em" }}>{order.tracking_number}</span>
+              <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14, color: "var(--teal-700)", letterSpacing: ".04em" }}>{order.tracking_no}</span>
             </div>
           )}
         </div>
@@ -86,8 +86,8 @@ export default async function OrderPage({ params, searchParams }: {
             {(order.order_items as any[]).map((item, i) => (
               <div key={i} style={{ display: "flex", gap: 14, alignItems: "center" }}>
                 <div style={{ width: 56, height: 56, borderRadius: 10, overflow: "hidden", background: "var(--neutral-100)", flexShrink: 0, position: "relative" }}>
-                  {item.products?.image_url ? (
-                    <Image src={item.products.image_url} alt={item.products.name} fill style={{ objectFit: "cover" }} sizes="56px" />
+                  {item.products?.images?.[0] ? (
+                    <Image src={item.products.images[0]} alt={item.products.name} fill style={{ objectFit: "cover" }} sizes="56px" />
                   ) : (
                     <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>💊</div>
                   )}

@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import CheckoutClient from "./CheckoutClient";
 
-export const metadata = { title: "ชำระเงิน — Doctermatee" };
+export const metadata = { title: "ชำระเงิน" };
 
 export default async function CheckoutPage() {
   const supabase = await createClient();

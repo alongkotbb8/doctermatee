@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { useCart } from "@/store/cart";
@@ -18,7 +18,8 @@ interface Props {
 
 export default function CheckoutClient({ user, profile }: Props) {
   const router = useRouter();
-  const { items, totalPrice, clearCart } = useCart();
+  const { items, totalPrice } = useCart();
+  const placedRef = useRef(false);
 
   const addr = profile?.default_address ?? {};
   const [fullName, setFullName] = useState(profile?.full_name ?? "");
@@ -36,6 +37,7 @@ export default function CheckoutClient({ user, profile }: Props) {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, boolean>>({});
 
   const subtotal = totalPrice();
   const shipping = subtotal >= FREE_SHIPPING_AT ? 0 : SHIPPING_FEE;
@@ -51,7 +53,8 @@ export default function CheckoutClient({ user, profile }: Props) {
   const total = subtotal + shipping - discount;
 
   useEffect(() => {
-    if (items.length === 0) router.replace("/cart");
+    // อย่าเด้งกลับ /cart ระหว่างกำลังพาไปหน้าชำระเงิน (cart จะถูกล้างหลังจ่ายสำเร็จ)
+    if (items.length === 0 && !placedRef.current) router.replace("/cart");
   }, [items, router]);
 
   async function applyCoupon() {
@@ -72,10 +75,15 @@ export default function CheckoutClient({ user, profile }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!fullName || !phone || !address || !district || !province || !postalCode) {
-      setError("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+    const required: Record<string, string> = { fullName, phone, email, address, district, province, postalCode };
+    const missing: Record<string, boolean> = {};
+    Object.entries(required).forEach(([k, v]) => { if (!v.trim()) missing[k] = true; });
+    if (Object.keys(missing).length > 0) {
+      setFieldErrors(missing);
+      setError("กรุณากรอกข้อมูลในช่องที่ไฮไลต์ให้ครบ");
       return;
     }
+    setFieldErrors({});
     setSubmitting(true);
     setError("");
 
@@ -97,7 +105,8 @@ export default function CheckoutClient({ user, profile }: Props) {
       return;
     }
 
-    clearCart();
+    // ไม่ล้าง cart ที่นี่ — จะล้างหลังชำระเงินสำเร็จในหน้า /payment
+    placedRef.current = true;
     router.push(`/payment/${json.order_id}`);
   }
 
@@ -109,6 +118,15 @@ export default function CheckoutClient({ user, profile }: Props) {
     paddingLeft: 38, paddingRight: 14, fontSize: 14, fontFamily: "var(--font-body)", outline: "none",
   };
   const inputNoIconStyle = { ...inputStyle, paddingLeft: 14 };
+
+  // ไฮไลต์ช่องที่กรอกไม่ครบเป็นสีแดง
+  const fieldStyle = (key: string, base: React.CSSProperties) => ({
+    ...base, borderColor: fieldErrors[key] ? "#EF4444" : "var(--neutral-200)",
+  });
+  const clearErr = (key: string) => { if (fieldErrors[key]) setFieldErrors((p) => ({ ...p, [key]: false })); };
+  const onBlurField = (key: string) => (e: React.FocusEvent<HTMLInputElement>) => {
+    e.target.style.borderColor = fieldErrors[key] ? "#EF4444" : "var(--neutral-200)";
+  };
 
   return (
     <div style={{ padding: "36px 0 64px", background: "var(--neutral-50)", minHeight: "80vh" }}>
@@ -131,8 +149,8 @@ export default function CheckoutClient({ user, profile }: Props) {
                   <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 5 }}>ชื่อ-นามสกุล *</label>
                   <div style={{ position: "relative" }}>
                     <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}><IconUser size={15} color="var(--neutral-400)" /></span>
-                    <input value={fullName} onChange={(e) => setFullName(e.target.value)} style={inputStyle} placeholder="สมชาย ใจดี"
-                      onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; }} />
+                    <input value={fullName} onChange={(e) => { setFullName(e.target.value); clearErr("fullName"); }} style={fieldStyle("fullName", inputStyle)} placeholder="สมชาย ใจดี"
+                      onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={onBlurField("fullName")} />
                   </div>
                 </div>
 
@@ -141,8 +159,8 @@ export default function CheckoutClient({ user, profile }: Props) {
                   <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 5 }}>เบอร์โทร *</label>
                   <div style={{ position: "relative" }}>
                     <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}><IconPhone size={15} color="var(--neutral-400)" /></span>
-                    <input value={phone} onChange={(e) => setPhone(e.target.value)} style={inputStyle} placeholder="08X-XXX-XXXX"
-                      onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; }} />
+                    <input value={phone} onChange={(e) => { setPhone(e.target.value); clearErr("phone"); }} style={fieldStyle("phone", inputStyle)} placeholder="08X-XXX-XXXX"
+                      onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={onBlurField("phone")} />
                   </div>
                 </div>
 
@@ -151,37 +169,37 @@ export default function CheckoutClient({ user, profile }: Props) {
                   <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 5 }}>อีเมล *</label>
                   <div style={{ position: "relative" }}>
                     <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}><IconMail size={15} color="var(--neutral-400)" /></span>
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} placeholder="example@email.com"
-                      onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; }} />
+                    <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); clearErr("email"); }} style={fieldStyle("email", inputStyle)} placeholder="example@email.com"
+                      onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={onBlurField("email")} />
                   </div>
                 </div>
 
                 {/* address */}
                 <div style={{ gridColumn: "1 / -1" }}>
                   <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 5 }}>ที่อยู่ *</label>
-                  <input value={address} onChange={(e) => setAddress(e.target.value)} style={inputNoIconStyle} placeholder="บ้านเลขที่ ถนน แขวง/ตำบล"
-                    onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; }} />
+                  <input value={address} onChange={(e) => { setAddress(e.target.value); clearErr("address"); }} style={fieldStyle("address", inputNoIconStyle)} placeholder="บ้านเลขที่ ถนน แขวง/ตำบล"
+                    onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={onBlurField("address")} />
                 </div>
 
                 {/* district */}
                 <div>
                   <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 5 }}>เขต/อำเภอ *</label>
-                  <input value={district} onChange={(e) => setDistrict(e.target.value)} style={inputNoIconStyle} placeholder="เขต/อำเภอ"
-                    onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; }} />
+                  <input value={district} onChange={(e) => { setDistrict(e.target.value); clearErr("district"); }} style={fieldStyle("district", inputNoIconStyle)} placeholder="เขต/อำเภอ"
+                    onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={onBlurField("district")} />
                 </div>
 
                 {/* province */}
                 <div>
                   <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 5 }}>จังหวัด *</label>
-                  <input value={province} onChange={(e) => setProvince(e.target.value)} style={inputNoIconStyle} placeholder="กรุงเทพมหานคร"
-                    onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; }} />
+                  <input value={province} onChange={(e) => { setProvince(e.target.value); clearErr("province"); }} style={fieldStyle("province", inputNoIconStyle)} placeholder="กรุงเทพมหานคร"
+                    onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={onBlurField("province")} />
                 </div>
 
                 {/* postal */}
                 <div>
                   <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 5 }}>รหัสไปรษณีย์ *</label>
-                  <input value={postalCode} onChange={(e) => setPostalCode(e.target.value)} style={inputNoIconStyle} placeholder="10110" maxLength={5}
-                    onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; }} />
+                  <input value={postalCode} onChange={(e) => { setPostalCode(e.target.value); clearErr("postalCode"); }} style={fieldStyle("postalCode", inputNoIconStyle)} placeholder="10110" maxLength={5}
+                    onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={onBlurField("postalCode")} />
                 </div>
 
                 {/* note */}

@@ -24,8 +24,9 @@ export default function AccountClient({ user, profile, orders }: Props) {
   const router = useRouter();
   const [tab, setTab] = useState<"profile" | "address" | "orders">("profile");
   const [showVerified, setShowVerified] = useState(typeof window !== "undefined" && new URLSearchParams(window.location.search).get("verified") === "1");
-  const [fullName, setFullName] = useState(profile?.full_name ?? "");
-  const [phone, setPhone] = useState(profile?.phone ?? "");
+  const meta = (user.user_metadata ?? {}) as { full_name?: string; phone?: string };
+  const [fullName, setFullName] = useState(profile?.full_name ?? meta.full_name ?? "");
+  const [phone, setPhone] = useState(profile?.phone ?? meta.phone ?? "");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -39,7 +40,7 @@ export default function AccountClient({ user, profile, orders }: Props) {
   async function saveProfile() {
     setSaving(true);
     const supabase = createClient();
-    await supabase.from("profiles").update({ full_name: fullName, phone }).eq("id", user.id);
+    await supabase.from("profiles").upsert({ id: user.id, full_name: fullName, phone }, { onConflict: "id" });
     setSaving(false); setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
@@ -47,9 +48,10 @@ export default function AccountClient({ user, profile, orders }: Props) {
   async function saveAddress() {
     setSaving(true);
     const supabase = createClient();
-    await supabase.from("profiles").update({
+    await supabase.from("profiles").upsert({
+      id: user.id,
       default_address: { full_name: fullName, phone, address, district, province, postal_code: postalCode },
-    }).eq("id", user.id);
+    }, { onConflict: "id" });
     setSaving(false); setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
@@ -82,7 +84,7 @@ export default function AccountClient({ user, profile, orders }: Props) {
               <IconUser size={24} color="#fff" />
             </div>
             <div>
-              <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 22, color: "var(--neutral-900)" }}>{profile?.full_name ?? "สมาชิก"}</h1>
+              <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 22, color: "var(--neutral-900)" }}>{fullName || "สมาชิก"}</h1>
               <p style={{ fontSize: 13, color: "var(--neutral-500)" }}>{user.email}</p>
             </div>
           </div>

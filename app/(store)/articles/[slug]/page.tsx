@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { data } = await supabase.from("articles").select("title, excerpt, cover_image").eq("slug", slug).single();
   if (!data) return { title: "ไม่พบบทความ" };
   return {
-    title: `${data.title} — Doctermatee`,
+    title: data.title,
     description: data.excerpt ?? undefined,
     openGraph: { title: data.title, description: data.excerpt ?? undefined, images: data.cover_image ? [data.cover_image] : [] },
   };

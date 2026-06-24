@@ -8,8 +8,8 @@ export default async function AdminOrderDetail({ params }: { params: Promise<{ i
 
   const { data: order } = await supabase
     .from("orders")
-    .select(`id, order_no, status, payment_status, total, subtotal, shipping_fee, discount, tracking_number, created_at, shipping_address,
-      order_items(qty, price, products(name, image_url))`)
+    .select(`id, order_no, status, payment_status, total, subtotal, shipping_fee, discount, tracking_no, created_at, shipping_address,
+      order_items(qty, price, products(name, images))`)
     .eq("id", id)
     .single();
 

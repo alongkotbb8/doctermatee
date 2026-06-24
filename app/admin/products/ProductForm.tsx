@@ -17,10 +17,8 @@ interface ProductData {
   stock: number;
   category_id: string;
   fda_no: string;
-  is_active: boolean;
-  is_new: boolean;
-  is_featured: boolean;
-  image_url: string | null;
+  status: "active" | "draft";
+  images: string[] | null;
 }
 
 interface Props {
@@ -45,10 +43,8 @@ export default function ProductForm({ categories, product }: Props) {
   const [stock, setStock] = useState(String(product?.stock ?? ""));
   const [categoryId, setCategoryId] = useState(product?.category_id ?? categories[0]?.id ?? "");
   const [fdaNo, setFdaNo] = useState(product?.fda_no ?? "");
-  const [isActive, setIsActive] = useState(product?.is_active ?? true);
-  const [isNew, setIsNew] = useState(product?.is_new ?? false);
-  const [isFeatured, setIsFeatured] = useState(product?.is_featured ?? false);
-  const [imageUrl, setImageUrl] = useState(product?.image_url ?? null);
+  const [isActive, setIsActive] = useState((product?.status ?? "active") === "active");
+  const [imageUrl, setImageUrl] = useState(product?.images?.[0] ?? null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -77,10 +73,8 @@ export default function ProductForm({ categories, product }: Props) {
       stock: parseInt(stock),
       category_id: categoryId,
       fda_no: fdaNo,
-      is_active: isActive,
-      is_new: isNew,
-      is_featured: isFeatured,
-      image_url: imageUrl,
+      status: isActive ? "active" : "draft",
+      images: imageUrl ? [imageUrl] : [],
     };
     if (isEdit) {
       const { error: e } = await supabase.from("products").update(payload).eq("id", product!.id!);
@@ -202,8 +196,6 @@ export default function ProductForm({ categories, product }: Props) {
             <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "var(--neutral-800)", margin: 0 }}>การแสดงผล</h2>
             {[
               { label: "เผยแพร่", value: isActive, set: setIsActive },
-              { label: "สินค้าใหม่ (badge)", value: isNew, set: setIsNew },
-              { label: "สินค้าแนะนำ", value: isFeatured, set: setIsFeatured },
             ].map(({ label, value, set }) => (
               <label key={label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
                 <span style={{ fontSize: 14, color: "var(--neutral-700)" }}>{label}</span>

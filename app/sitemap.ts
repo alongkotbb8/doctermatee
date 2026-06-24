@@ -6,7 +6,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const service = createServiceClient();
 
   const [{ data: products }, { data: articles }] = await Promise.all([
-    service.from("products").select("slug, updated_at").eq("is_active", true),
+    service.from("products").select("slug, created_at").eq("status", "active"),
     service.from("articles").select("slug, updated_at").eq("is_published", true),
   ]);
 
@@ -18,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const productRoutes: MetadataRoute.Sitemap = (products ?? []).map((p) => ({
     url: `${siteUrl}/products/${p.slug}`,
-    lastModified: p.updated_at ? new Date(p.updated_at) : new Date(),
+    lastModified: p.created_at ? new Date(p.created_at) : new Date(),
     changeFrequency: "weekly",
     priority: 0.8,
   }));

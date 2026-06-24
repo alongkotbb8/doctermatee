@@ -15,7 +15,7 @@ export default async function AdminOrders({ searchParams }: { searchParams: Prom
 
   let query = supabase
     .from("orders")
-    .select("id, order_no, total, status, payment_status, created_at, tracking_number, shipping_address")
+    .select("id, order_no, total, status, payment_status, created_at, tracking_no, shipping_address")
     .order("created_at", { ascending: false });
 
   if (status) query = query.eq("status", status);
@@ -69,7 +69,7 @@ export default async function AdminOrders({ searchParams }: { searchParams: Prom
                     <span style={{ background: s.bg, color: s.color, borderRadius: "var(--radius-full)", padding: "4px 10px", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap" }}>{s.label}</span>
                   </td>
                   <td style={{ padding: "14px 16px", fontSize: 13, color: "var(--neutral-600)", fontFamily: "var(--font-display)", letterSpacing: ".04em" }}>
-                    {o.tracking_number ?? <span style={{ color: "var(--neutral-300)" }}>—</span>}
+                    {o.tracking_no ?? <span style={{ color: "var(--neutral-300)" }}>—</span>}
                   </td>
                   <td style={{ padding: "14px 16px" }}>
                     <Link href={`/admin/orders/${o.id}`} style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--teal-600)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>

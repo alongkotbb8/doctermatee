@@ -24,7 +24,7 @@ const STATUS_STYLE: Record<string, { color: string; bg: string }> = {
 export default function OrderDetailClient({ order }: { order: any }) {
   const router = useRouter();
   const [status, setStatus] = useState(order.status);
-  const [tracking, setTracking] = useState(order.tracking_number ?? "");
+  const [tracking, setTracking] = useState(order.tracking_no ?? "");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -35,7 +35,7 @@ export default function OrderDetailClient({ order }: { order: any }) {
     setSaving(true);
     const supabase = createClient();
     const wasNotShipped = order.status !== "shipped";
-    await supabase.from("orders").update({ status, tracking_number: tracking || null }).eq("id", order.id);
+    await supabase.from("orders").update({ status, tracking_no: tracking || null }).eq("id", order.id);
 
     // Send shipping email when status changes to shipped and tracking is set
     if (status === "shipped" && tracking && wasNotShipped) {
@@ -76,8 +76,8 @@ export default function OrderDetailClient({ order }: { order: any }) {
               {order.order_items.map((item: any, i: number) => (
                 <div key={i} style={{ display: "flex", gap: 14, alignItems: "center" }}>
                   <div style={{ width: 52, height: 52, borderRadius: 8, overflow: "hidden", background: "var(--neutral-100)", flexShrink: 0, position: "relative" }}>
-                    {item.products?.image_url
-                      ? <Image src={item.products.image_url} alt={item.products.name} fill style={{ objectFit: "cover" }} sizes="52px" />
+                    {item.products?.images?.[0]
+                      ? <Image src={item.products.images[0]} alt={item.products.name} fill style={{ objectFit: "cover" }} sizes="52px" />
                       : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>💊</div>}
                   </div>
                   <div style={{ flex: 1 }}>

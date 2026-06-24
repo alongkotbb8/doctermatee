@@ -24,7 +24,7 @@ export default function ReportsClient({ orders, dailyRevenue, topProducts, stats
           o.total,
           o.status,
           o.payment_status,
-          o.tracking_number ?? "",
+          o.tracking_no ?? "",
         ];
       }),
     ];

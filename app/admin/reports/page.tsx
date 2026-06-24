@@ -10,7 +10,7 @@ export default async function ReportsPage() {
 
   const { data: orders } = await supabase
     .from("orders")
-    .select("id, order_no, total, status, payment_status, created_at, shipping_address, order_items(qty, price, products(name, categories(name)))")
+    .select("id, order_no, total, status, payment_status, created_at, tracking_no, shipping_address, order_items(qty, price, products(name, categories(name)))")
     .gte("created_at", thirtyDaysAgo.toISOString())
     .order("created_at", { ascending: false });
 

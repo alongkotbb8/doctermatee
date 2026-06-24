@@ -5,7 +5,7 @@ import Image from "next/image";
 import { IconArrowRight, IconClock } from "@/components/icons";
 
 export const metadata: Metadata = {
-  title: "บทความสุขภาพ — Doctermatee",
+  title: "บทความสุขภาพ",
   description: "บทความและความรู้ด้านสุขภาพ วิตามิน อาหารเสริม จากผู้เชี่ยวชาญ",
 };
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useCart } from "@/store/cart";
 import { IconCreditCard, IconQr, IconShield, IconCheck } from "@/components/icons";
 
 declare global {
@@ -24,6 +25,7 @@ interface Props {
 
 export default function PaymentClient({ orderId, orderNo, total, omisePublicKey }: Props) {
   const router = useRouter();
+  const clearCart = useCart((s) => s.clearCart);
   const [method, setMethod] = useState<PayMethod>("promptpay");
   const [omiseReady, setOmiseReady] = useState(false);
 
@@ -61,6 +63,7 @@ export default function PaymentClient({ orderId, orderNo, total, omisePublicKey 
       const json = await res.json();
       if (json.paid) {
         clearInterval(pollRef.current!);
+        clearCart();
         router.push(`/order/${orderId}?success=1`);
       }
     }, 4000);
@@ -91,6 +94,7 @@ export default function PaymentClient({ orderId, orderNo, total, omisePublicKey 
       });
       const chargeJson = await charge.json();
       if (chargeJson.status === "successful") {
+        clearCart();
         router.push(`/order/${orderId}?success=1`);
       } else {
         setError(chargeJson.error ?? "การชำระเงินไม่สำเร็จ กรุณาลองใหม่");

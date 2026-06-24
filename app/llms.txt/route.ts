@@ -6,7 +6,7 @@ export async function GET() {
   const service = createServiceClient();
 
   const [{ data: products }, { data: articles }] = await Promise.all([
-    service.from("products").select("name, slug, description, price").eq("is_active", true).limit(50),
+    service.from("products").select("name, slug, description, price").eq("status", "active").limit(50),
     service.from("articles").select("title, slug, excerpt").eq("is_published", true).limit(20),
   ]);
 

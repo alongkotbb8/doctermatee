@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import AccountClient from "./AccountClient";
 
-export const metadata = { title: "บัญชีของฉัน — Doctermatee" };
+export const metadata = { title: "บัญชีของฉัน" };
 
 export default async function AccountPage() {
   const supabase = await createClient();

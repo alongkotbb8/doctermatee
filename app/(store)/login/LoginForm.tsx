@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 import { IconMail, IconShield } from "@/components/icons";
 
 export default function LoginForm() {
@@ -17,14 +18,16 @@ export default function LoginForm() {
     setLoading(true);
     setError("");
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error || !data.user) {
       setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
       setLoading(false);
-    } else {
-      router.push("/account");
-      router.refresh();
+      return;
     }
+    // admin → ไปหน้าหลังบ้านอัตโนมัติ, ลูกค้า → หน้าบัญชี
+    const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).single();
+    router.push(profile?.role === "admin" ? "/admin" : "/account");
+    router.refresh();
   }
 
   return (
@@ -46,7 +49,10 @@ export default function LoginForm() {
       </div>
 
       <div>
-        <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--neutral-700)", marginBottom: 6 }}>รหัสผ่าน</label>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+          <label style={{ fontSize: 13, fontWeight: 600, color: "var(--neutral-700)" }}>รหัสผ่าน</label>
+          <Link href="/forgot-password" style={{ fontSize: 12, color: "var(--teal-600)", fontWeight: 600, textDecoration: "none" }}>ลืมรหัสผ่าน?</Link>
+        </div>
         <div style={{ position: "relative" }}>
           <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}>
             <IconShield size={16} color="var(--neutral-400)" />
