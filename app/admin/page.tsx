@@ -7,11 +7,13 @@ export default async function AdminDashboard() {
   const [
     { count: orderCount },
     { data: revenue },
+    { data: pending },
     { count: productCount },
     { data: recentOrders },
   ] = await Promise.all([
     supabase.from("orders").select("*", { count: "exact", head: true }),
     supabase.from("orders").select("total").eq("payment_status", "paid"),
+    supabase.from("orders").select("total").eq("payment_status", "unpaid"),
     supabase.from("products").select("*", { count: "exact", head: true }),
     supabase.from("orders")
       .select("id, order_no, total, status, payment_status, created_at, shipping_address")
@@ -20,6 +22,7 @@ export default async function AdminDashboard() {
   ]);
 
   const totalRevenue = revenue?.reduce((s, o) => s + o.total, 0) ?? 0;
+  const pendingRevenue = pending?.reduce((s, o) => s + o.total, 0) ?? 0;
 
   const STATUS: Record<string, { label: string; color: string; bg: string }> = {
     pending:   { label: "รอดำเนินการ", color: "#92400E", bg: "#FEF3C7" },
@@ -33,9 +36,10 @@ export default async function AdminDashboard() {
       <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 26, color: "var(--neutral-900)", marginBottom: 28 }}>แดชบอร์ด</h1>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 32 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginBottom: 32 }}>
         {[
           { label: "รายได้รวม (ชำระแล้ว)", value: `฿${totalRevenue.toLocaleString()}`, icon: <IconBarChart size={22} color="var(--teal-600)" />, bg: "var(--teal-50)" },
+          { label: "รายได้รอชำระ", value: `฿${pendingRevenue.toLocaleString()}`, icon: <IconTag size={22} color="#D97706" />, bg: "#FFFBEB" },
           { label: "ออเดอร์ทั้งหมด", value: `${orderCount ?? 0}`, icon: <IconTruck size={22} color="#1E40AF" />, bg: "#EFF6FF" },
           { label: "สินค้าทั้งหมด", value: `${productCount ?? 0}`, icon: <IconPackage size={22} color="#7C3AED" />, bg: "#F5F3FF" },
         ].map((s) => (

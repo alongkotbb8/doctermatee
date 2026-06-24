@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { useCart } from "@/store/cart";
+import { createClient } from "@/lib/supabase/client";
 import { IconTag, IconTruck, IconUser, IconPhone, IconMail, IconShield, IconPill } from "@/components/icons";
 import Link from "next/link";
 import Image from "next/image";
@@ -23,9 +24,9 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
   const placedRef = useRef(false);
 
   const addr = profile?.default_address ?? {};
-  const [fullName, setFullName] = useState(profile?.full_name ?? "");
-  const [phone, setPhone] = useState(profile?.phone ?? "");
-  const [email, setEmail] = useState(user?.email ?? "");
+  const [fullName, setFullName] = useState(profile?.full_name ?? addr.full_name ?? "");
+  const [phone, setPhone] = useState(profile?.phone ?? addr.phone ?? "");
+  const [email, setEmail] = useState(user?.email ?? addr.email ?? "");
   const [address, setAddress] = useState(addr.address ?? "");
   const [district, setDistrict] = useState(addr.district ?? "");
   const [province, setProvince] = useState(addr.province ?? "");
@@ -104,6 +105,17 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
       setError(json.error ?? "เกิดข้อผิดพลาด กรุณาลองใหม่");
       setSubmitting(false);
       return;
+    }
+
+    // FR1: auto-save ที่อยู่ผูกกับบัญชี (ถ้า login) เพื่อ pre-fill ครั้งถัดไป
+    if (user) {
+      const supabase = createClient();
+      await supabase.from("profiles").upsert({
+        id: user.id,
+        full_name: fullName,
+        phone,
+        default_address: { full_name: fullName, phone, email, address, district, province, postal_code: postalCode },
+      }, { onConflict: "id" }).then(() => {}, () => {});
     }
 
     // ไม่ล้าง cart ที่นี่ — จะล้างหลังชำระเงินสำเร็จในหน้า /payment

@@ -1,7 +1,13 @@
 import Link from "next/link";
+import { getSettings } from "@/lib/data";
 import { IconPhone, IconMail, IconClock, IconCreditCard, IconQr, IconPlus } from "./icons";
 
-export default function Footer() {
+export default async function Footer() {
+  const settings = await getSettings();
+  const c = (settings.contact ?? {}) as { phone?: string; email?: string; hours?: string };
+  const phone = c.phone ?? "02-123-4567";
+  const email = c.email ?? "hello@doctermatee.co.th";
+  const hours = c.hours ?? "ทุกวัน 8:00–20:00";
   return (
     <footer style={{ background: "var(--teal-900)", color: "#9FE1CB", padding: "54px 0 26px", marginTop: "auto" }}>
       <div className="wrap">
@@ -43,9 +49,9 @@ export default function Footer() {
             <h4 style={{ fontFamily: "var(--font-display)", fontWeight: 600, color: "#fff", fontSize: 15, marginBottom: 14 }}>ติดต่อเรา</h4>
             <div style={{ fontSize: 14, lineHeight: 1 }}>
               {[
-                { icon: <IconPhone size={14} color="#9FE1CB" />, text: "02-123-4567" },
-                { icon: <IconMail size={14} color="#9FE1CB" />, text: "hello@doctermatee.co.th" },
-                { icon: <IconClock size={14} color="#9FE1CB" />, text: "ทุกวัน 8:00–20:00" },
+                { icon: <IconPhone size={14} color="#9FE1CB" />, text: phone },
+                { icon: <IconMail size={14} color="#9FE1CB" />, text: email },
+                { icon: <IconClock size={14} color="#9FE1CB" />, text: hours },
               ].map(({ icon, text }) => (
                 <div key={text} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                   {icon}<span>{text}</span>
