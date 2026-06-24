@@ -133,7 +133,7 @@ export default async function HomePage() {
       )}
 
       {/* ── Stats / social proof ─────────────────────────── */}
-      <section style={{ background: "#fff", padding: "8px 0 4px" }}>
+      <section className="reveal" style={{ background: "#fff", padding: "16px 0 8px" }}>
         <div className="wrap">
           <div className="stats-bar" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: "20px 8px", background: "linear-gradient(135deg,var(--green-50),#fff)", border: "1px solid var(--teal-100)", borderRadius: "var(--radius-lg)", padding: "24px 28px" }}>
             {STATS.map((s, i) => (
@@ -151,7 +151,7 @@ export default async function HomePage() {
 
       {/* ── Products: Featured + Grid ─────────────────────── */}
       {sections.includes("products") && (
-        <section style={{ padding: "18px 0 64px" }}>
+        <section className="reveal" style={{ padding: "40px 0 72px" }}>
           <div className="wrap">
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
               <div className="anim-fade-up">
@@ -226,7 +226,7 @@ export default async function HomePage() {
               )}
 
               {/* Grid — right */}
-              <div className="col-8" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, alignContent: "start" }}>
+              <div className="col-8" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 22, alignContent: "start" }}>
                 {gridProducts.map((p, i) => (
                   <div key={p.id} className={`anim-fade-up d${Math.min(i + 1, 5)}`}>
                     <ProductCard product={p} />
@@ -240,10 +240,10 @@ export default async function HomePage() {
 
       {/* ── Categories (ระหว่างสินค้ากับบทความ) ───────────── */}
       {sections.includes("categories") && (categories?.length ?? 0) > 0 && (
-        <section style={{ background: "#fff", padding: "8px 0 48px" }}>
+        <section className="reveal" style={{ background: "#fff", padding: "16px 0 56px" }}>
           <div className="wrap">
             <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 24, letterSpacing: "-.02em", color: "var(--neutral-900)", marginBottom: 20 }}>เลือกตามหมวดหมู่</h2>
-            <div className="cat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 16 }}>
+            <div className="cat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 22 }}>
               {categories!.map((cat, i) => (
                 <div key={cat.id} className={`anim-pop-in d${Math.min(i + 1, 5)}`}>
                   <CategoryCard href={`/products?category=${cat.slug}`} iconKey={CAT_ICON_KEY[cat.slug] ?? "pill"} name={cat.name} />
@@ -256,7 +256,7 @@ export default async function HomePage() {
 
       {/* ── Articles: pinned + cards ─────────────────────── */}
       {pinnedArticle && (
-        <section style={{ padding: "8px 0 56px" }}>
+        <section className="reveal" style={{ padding: "16px 0 64px" }}>
           <div className="wrap">
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
               <div>
@@ -325,7 +325,7 @@ export default async function HomePage() {
 
       {/* ── Promo banner ─────────────────────────────────── */}
       {sections.includes("promo") && promo.show !== false && (
-        <section style={{ padding: "0 0 64px" }}>
+        <section className="reveal" style={{ padding: "0 0 72px" }}>
           <div className="wrap">
             <div className="anim-fade-up" style={{ background: "linear-gradient(120deg,var(--teal-700),var(--teal-500))", borderRadius: "var(--radius-lg)", padding: "44px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24, color: "#fff", flexWrap: "wrap" }}>
               <div>
