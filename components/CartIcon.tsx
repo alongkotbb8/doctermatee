@@ -9,7 +9,7 @@ export default function CartIcon() {
 
   return (
     <Link href="/cart" className="icon-btn" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, color: "var(--neutral-700)", fontSize: 11, position: "relative", textDecoration: "none" }}>
-      <span style={{ position: "relative" }}>
+      <span id="cart-fly-target" style={{ position: "relative", display: "inline-flex" }}>
         <IconCart size={22} color="var(--neutral-700)" />
         {totalItems > 0 && (
           <span style={{
