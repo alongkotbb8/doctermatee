@@ -41,7 +41,7 @@ export default async function ArticlesPage() {
         ) : (
           <>
             {/* Featured (ซ้าย) + รายการ (ขวา) */}
-            <div className="grid-12" style={{ gap: 28, marginBottom: rest.length ? 40 : 0 }}>
+            <div className="grid-12" style={{ gap: 28, alignItems: "stretch", marginBottom: rest.length ? 40 : 0 }}>
               {/* Featured ใหญ่ */}
               <Link href={`/articles/${featured.slug}`} className="col-7 anim-fade-up" style={{ textDecoration: "none" }}>
                 <article className="card pcard-hover" style={{ overflow: "hidden", height: "100%", display: "flex", flexDirection: "column" }}>
@@ -64,15 +64,15 @@ export default async function ArticlesPage() {
                 </article>
               </Link>
 
-              {/* รายการด้านขวา */}
-              <div className="col-5" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {/* รายการด้านขวา — ยืดเต็มความสูงให้พอดีการ์ดเด่น */}
+              <div className="col-5" style={{ display: "flex", flexDirection: "column", gap: 16, height: "100%" }}>
                 {sideList.map((a, i) => (
-                  <Link key={a.id} href={`/articles/${a.slug}`} className={`anim-fade-up d${Math.min(i + 1, 5)}`} style={{ textDecoration: "none" }}>
-                    <article className="card" style={{ display: "flex", gap: 14, padding: 12, alignItems: "stretch", transition: "box-shadow .2s, transform .2s" }}>
-                      <div style={{ width: 104, height: 84, borderRadius: 10, overflow: "hidden", flexShrink: 0, background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", position: "relative" }}>
+                  <Link key={a.id} href={`/articles/${a.slug}`} className={`anim-fade-up d${Math.min(i + 1, 5)}`} style={{ textDecoration: "none", flex: 1, display: "block" }}>
+                    <article className="card pcard-hover" style={{ display: "flex", gap: 14, padding: 12, height: "100%", transition: "box-shadow .2s, transform .2s" }}>
+                      <div style={{ width: 128, borderRadius: 10, overflow: "hidden", flexShrink: 0, background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", position: "relative", minHeight: 92 }}>
                         {a.cover_image
-                          ? <Image src={a.cover_image} alt={a.title} fill style={{ objectFit: "cover" }} sizes="104px" />
-                          : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--teal-300)" }}><IconClock size={26} color="currentColor" /></div>}
+                          ? <Image src={a.cover_image} alt={a.title} fill style={{ objectFit: "cover" }} sizes="128px" />
+                          : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--teal-300)" }}><IconClock size={28} color="currentColor" /></div>}
                       </div>
                       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "center" }}>
                         <span style={{ fontSize: 11, color: "var(--teal-600)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".04em", marginBottom: 4 }}>บทความ</span>
