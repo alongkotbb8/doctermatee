@@ -10,7 +10,6 @@ export default async function AdminSettings() {
     <SettingsForm
       contact={(map.contact ?? {}) as { phone?: string; email?: string; hours?: string }}
       shipping={(map.shipping ?? {}) as { free_threshold?: number; standard_fee?: number }}
-      hero={(map.hero ?? {}) as { title?: string; subtitle?: string }}
     />
   );
 }

@@ -45,9 +45,11 @@ export default async function HomePage() {
   const otherArticles = articles.slice(1, 4);
 
   const config = (configRow?.value ?? {}) as HomepageConfig;
-  const heroImg = (heroRow?.value as { image?: string } | null)?.image ?? null;
+  // hero ทั้งหมด (ข้อความ + รูป) อ่านจาก site_settings key="hero" เพื่อให้หน้า "แบนเนอร์" หลังบ้านคุมได้
+  const heroCfg = (heroRow?.value ?? {}) as HeroConfig;
+  const heroImg = heroCfg.image ?? null;
   const sections = config.sections ?? ["hero", "categories", "products", "promo"];
-  const hc = config.hero ?? {};
+  const hc: HeroConfig = { ...(config.hero ?? {}), ...heroCfg };
   const pc = config.products ?? {};
   const promo = config.promo ?? {};
 
@@ -133,11 +135,11 @@ export default async function HomePage() {
       {/* ── Stats / social proof ─────────────────────────── */}
       <section style={{ background: "#fff", padding: "8px 0 4px" }}>
         <div className="wrap">
-          <div className="stats-bar" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 16, background: "linear-gradient(135deg,var(--green-50),#fff)", border: "1px solid var(--teal-100)", borderRadius: "var(--radius-lg)", padding: "22px 28px" }}>
-            {STATS.map((s) => (
-              <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 12, flex: "1 1 180px", minWidth: 0 }}>
+          <div className="stats-bar" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: "20px 8px", background: "linear-gradient(135deg,var(--green-50),#fff)", border: "1px solid var(--teal-100)", borderRadius: "var(--radius-lg)", padding: "24px 28px" }}>
+            {STATS.map((s, i) => (
+              <div key={s.label} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 13, flex: "1 1 0", minWidth: 180, borderLeft: i > 0 ? "1px solid var(--teal-100)" : "none" }}>
                 <span style={{ width: 48, height: 48, borderRadius: 14, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "var(--shadow-sm)", flexShrink: 0 }}>{s.icon}</span>
-                <div style={{ minWidth: 0 }}>
+                <div>
                   <p style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 22, color: "var(--neutral-900)", letterSpacing: "-.02em" }}>{s.value}</p>
                   <p style={{ margin: 0, fontSize: 12.5, color: "var(--neutral-500)" }}>{s.label}</p>
                 </div>
@@ -146,21 +148,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* ── Categories ───────────────────────────────────── */}
-      {sections.includes("categories") && (
-        <section style={{ background: "#fff", padding: "32px 0" }}>
-          <div className="wrap">
-            <div className="cat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 14 }}>
-              {categories?.map((cat, i) => (
-                <div key={cat.id} className={`anim-pop-in d${Math.min(i + 1, 5)}`}>
-                  <CategoryCard href={`/products?category=${cat.slug}`} iconKey={CAT_ICON_KEY[cat.slug] ?? "pill"} name={cat.name} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* ── Products: Featured + Grid ─────────────────────── */}
       {sections.includes("products") && (
@@ -246,6 +233,22 @@ export default async function HomePage() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Categories (ระหว่างสินค้ากับบทความ) ───────────── */}
+      {sections.includes("categories") && (categories?.length ?? 0) > 0 && (
+        <section style={{ background: "#fff", padding: "8px 0 48px" }}>
+          <div className="wrap">
+            <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 24, letterSpacing: "-.02em", color: "var(--neutral-900)", marginBottom: 20 }}>เลือกตามหมวดหมู่</h2>
+            <div className="cat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 16 }}>
+              {categories!.map((cat, i) => (
+                <div key={cat.id} className={`anim-pop-in d${Math.min(i + 1, 5)}`}>
+                  <CategoryCard href={`/products?category=${cat.slug}`} iconKey={CAT_ICON_KEY[cat.slug] ?? "pill"} name={cat.name} />
+                </div>
+              ))}
             </div>
           </div>
         </section>

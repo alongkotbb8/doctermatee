@@ -16,12 +16,31 @@ const LINKS = [
 export default function Navbar() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   // ปิดเมนูเมื่อเปลี่ยนหน้า
   useEffect(() => { setOpen(false); }, [path]);
 
+  // liquid glass เมื่อเลื่อนหน้าลง
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <header style={{ background: "#fff", borderBottom: "1px solid var(--neutral-100)", position: "sticky", top: 0, zIndex: 40 }}>
+    <header
+      style={{
+        position: "sticky", top: 0, zIndex: 40,
+        background: scrolled ? "rgba(255,255,255,0.72)" : "#fff",
+        WebkitBackdropFilter: scrolled ? "saturate(180%) blur(18px)" : "none",
+        backdropFilter: scrolled ? "saturate(180%) blur(18px)" : "none",
+        borderBottom: scrolled ? "1px solid rgba(13,148,136,0.14)" : "1px solid var(--neutral-100)",
+        boxShadow: scrolled ? "0 8px 28px -12px rgba(13,148,136,0.28)" : "none",
+        transition: "background .25s var(--ease), box-shadow .25s var(--ease), border-color .25s var(--ease)",
+      }}
+    >
       <div className="wrap nav-bar" style={{ display: "flex", alignItems: "center", gap: 16, height: 68 }}>
 
         {/* Hamburger (มือถือ) */}
@@ -54,17 +73,12 @@ export default function Navbar() {
         </nav>
 
         {/* Search */}
-        <div className="nav-search" style={{ flex: 1, display: "flex", alignItems: "center", background: "var(--neutral-50)", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-full)", padding: "0 6px 0 16px", height: 42, minWidth: 0, maxWidth: 360, marginLeft: "auto" }}>
+        <div className="nav-search" style={{ flex: 1, display: "flex", alignItems: "center", background: "var(--neutral-50)", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-full)", padding: "0 6px 0 16px", height: 42, minWidth: 0, maxWidth: 340, marginLeft: "auto" }}>
           <input type="text" placeholder="ค้นหาสินค้า…" style={{ flex: 1, minWidth: 0, border: "none", background: "none", outline: "none", fontFamily: "var(--font-body)", fontSize: 14, color: "var(--neutral-900)" }} />
           <button aria-label="ค้นหา" style={{ width: 32, height: 32, border: "none", borderRadius: "50%", background: "var(--color-primary)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             <IconSearch size={15} color="#fff" />
           </button>
         </div>
-
-        {/* Consult (เดสก์ท็อป) */}
-        <Link href="/contact" className="nav-consult" style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "var(--teal-700)", textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0 }}>
-          <IconStethoscope size={18} color="var(--teal-700)" /> ปรึกษาแพทย์
-        </Link>
 
         {/* Account + Cart */}
         <div style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
@@ -73,6 +87,11 @@ export default function Navbar() {
           </Link>
           <CartIcon />
         </div>
+
+        {/* Consult — ขวาสุด (เดสก์ท็อป) */}
+        <Link href="/contact" className="nav-consult" style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--green-50)", border: "1px solid var(--teal-100)", borderRadius: "var(--radius-full)", padding: "8px 16px", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "var(--teal-700)", textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0 }}>
+          <IconStethoscope size={18} color="var(--teal-700)" /> ปรึกษาแพทย์
+        </Link>
       </div>
 
       {/* Mobile drawer */}

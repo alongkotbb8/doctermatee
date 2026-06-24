@@ -3,15 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { IconCheck, IconPhone, IconTruck, IconSettings } from "@/components/icons";
+import { IconCheck, IconPhone, IconTruck } from "@/components/icons";
 
 interface Props {
   contact: { phone?: string; email?: string; hours?: string };
   shipping: { free_threshold?: number; standard_fee?: number };
-  hero: { title?: string; subtitle?: string };
 }
 
-export default function SettingsForm({ contact, shipping, hero }: Props) {
+export default function SettingsForm({ contact, shipping }: Props) {
   const router = useRouter();
 
   const [phone, setPhone] = useState(contact.phone ?? "");
@@ -19,8 +18,6 @@ export default function SettingsForm({ contact, shipping, hero }: Props) {
   const [hours, setHours] = useState(contact.hours ?? "");
   const [freeThreshold, setFreeThreshold] = useState(String(shipping.free_threshold ?? 500));
   const [standardFee, setStandardFee] = useState(String(shipping.standard_fee ?? 50));
-  const [heroTitle, setHeroTitle] = useState(hero.title ?? "");
-  const [heroSubtitle, setHeroSubtitle] = useState(hero.subtitle ?? "");
 
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -32,7 +29,6 @@ export default function SettingsForm({ contact, shipping, hero }: Props) {
     const rows = [
       { key: "contact", value: { phone, email, hours } },
       { key: "shipping", value: { free_threshold: parseInt(freeThreshold) || 0, standard_fee: parseInt(standardFee) || 0 } },
-      { key: "hero", value: { ...hero, title: heroTitle, subtitle: heroSubtitle } },
     ];
     const { error: e } = await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
     if (e) { setError(e.message); setSaving(false); return; }
@@ -71,13 +67,11 @@ export default function SettingsForm({ contact, shipping, hero }: Props) {
           <p style={{ fontSize: 12, color: "var(--neutral-400)", margin: 0 }}>ค่านี้มีผลกับหน้าตะกร้าและหน้าชำระเงินทันทีหลังบันทึก</p>
         </div>
 
-        <div className="card" style={card}>
-          {head(<IconSettings size={17} color="var(--teal-600)" />, "ข้อความหน้าแรก (Hero)")}
-          <div><label style={lbl}>หัวข้อหลัก</label><input value={heroTitle} onChange={(e) => setHeroTitle(e.target.value)} style={inp} placeholder="สุขภาพดีเริ่มต้นที่นี่" /></div>
-          <div><label style={lbl}>คำอธิบาย</label><textarea value={heroSubtitle} onChange={(e) => setHeroSubtitle(e.target.value)} rows={3} style={{ ...inp, height: "auto", padding: "10px 14px", resize: "vertical" }} /></div>
+        <div className="card" style={{ ...card, gap: 6 }}>
+          <p style={{ margin: 0, fontSize: 13, color: "var(--neutral-600)" }}>แก้ข้อความและรูปแบนเนอร์หน้าแรกได้ที่เมนู <strong>“แบนเนอร์หลัก”</strong></p>
         </div>
 
-        {error && <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: "var(--radius-sm)", padding: "10px 14px", fontSize: 13, color: "#DC2626" }}>{error}</div>}
+        {error &&<div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: "var(--radius-sm)", padding: "10px 14px", fontSize: 13, color: "#DC2626" }}>{error}</div>}
 
         <button onClick={save} disabled={saving} style={{ alignSelf: "flex-start", background: saved ? "var(--teal-700)" : "var(--teal-600)", color: "#fff", border: "none", borderRadius: "var(--radius-full)", padding: "12px 30px", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 6 }}>
           {saved ? <><IconCheck size={16} color="#fff" /> บันทึกแล้ว</> : saving ? "กำลังบันทึก…" : "บันทึกการตั้งค่า"}
