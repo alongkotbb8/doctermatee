@@ -1,29 +1,24 @@
-import { createClient } from "@/lib/supabase/server";
+import { getPublishedArticles, type HomeArticle } from "@/lib/data";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { IconArrowRight, IconClock } from "@/components/icons";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "บทความสุขภาพ",
   description: "บทความและความรู้ด้านสุขภาพ วิตามิน อาหารเสริม จากผู้เชี่ยวชาญ",
 };
 
-interface Art { id: string; title: string; slug: string; excerpt: string | null; cover_image: string | null; published_at: string | null; read_time_min: number | null; }
+type Art = HomeArticle;
 
 function fmtDate(d: string | null) {
   return d ? new Date(d).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" }) : "";
 }
 
 export default async function ArticlesPage() {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("articles")
-    .select("id, title, slug, excerpt, cover_image, published_at, read_time_min")
-    .eq("is_published", true)
-    .order("published_at", { ascending: false });
-
-  const articles = (data ?? []) as Art[];
+  const articles: Art[] = await getPublishedArticles();
   const featured = articles[0];
   const sideList = articles.slice(1, 4);
   const rest = articles.slice(4);

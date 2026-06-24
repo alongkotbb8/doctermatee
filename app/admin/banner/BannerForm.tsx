@@ -45,6 +45,7 @@ export default function BannerForm({ hero }: { hero: Hero }) {
     const value = { title, accent, subtitle, image: image || null, cta_primary: ctaPrimary, cta_secondary: ctaSecondary };
     const { error: e } = await supabase.from("site_settings").upsert({ key: "hero", value }, { onConflict: "key" });
     if (e) { setError(e.message); setSaving(false); return; }
+    await fetch("/api/revalidate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tags: ["settings"] }) }).catch(() => {});
     setSaving(false); setSaved(true);
     setTimeout(() => setSaved(false), 2000);
     router.refresh();

@@ -32,6 +32,7 @@ export default function SettingsForm({ contact, shipping }: Props) {
     ];
     const { error: e } = await supabase.from("site_settings").upsert(rows, { onConflict: "key" });
     if (e) { setError(e.message); setSaving(false); return; }
+    await fetch("/api/revalidate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tags: ["settings", "catalog"] }) }).catch(() => {});
     setSaving(false); setSaved(true);
     setTimeout(() => setSaved(false), 2000);
     router.refresh();

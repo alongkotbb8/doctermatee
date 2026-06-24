@@ -57,6 +57,7 @@ export default function ArticleForm({ article }: Props) {
       const { error: e } = await supabase.from("articles").insert(payload);
       if (e) { setError(e.message); setSaving(false); return; }
     }
+    await fetch("/api/revalidate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tags: ["articles"] }) }).catch(() => {});
     setSaving(false); setSaved(true);
     setTimeout(() => router.push("/admin/articles"), 900);
   }
@@ -65,6 +66,7 @@ export default function ArticleForm({ article }: Props) {
     if (!confirm("ลบบทความนี้?")) return;
     const supabase = createClient();
     await supabase.from("articles").delete().eq("id", article!.id!);
+    await fetch("/api/revalidate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tags: ["articles"] }) }).catch(() => {});
     router.push("/admin/articles");
   }
 

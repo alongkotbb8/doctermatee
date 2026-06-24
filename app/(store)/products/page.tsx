@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveProducts, getCategories } from "@/lib/data";
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/lib/types";
 
@@ -9,22 +9,13 @@ interface Props {
 
 export default async function ProductsPage({ searchParams }: Props) {
   const { category } = await searchParams;
-  const supabase = await createClient();
 
-  const { data: categories } = await supabase.from("categories").select("*").order("name");
+  const [allProducts, categories] = await Promise.all([getActiveProducts(), getCategories()]);
 
-  let query = supabase
-    .from("products")
-    .select("*, categories(id,name,slug)")
-    .eq("status", "active")
-    .order("created_at", { ascending: false });
-
-  if (category) {
-    const cat = categories?.find((c) => c.slug === category);
-    if (cat) query = query.eq("category_id", cat.id);
-  }
-
-  const { data: products } = await query;
+  // กรองตามหมวดในหน่วยความจำ (ข้อมูล cache แล้ว — ไม่ยิง DB ต่อคำขอ)
+  const products = category
+    ? allProducts.filter((p) => (p.categories as { slug?: string } | null)?.slug === category)
+    : allProducts;
 
   return (
     <div style={{ padding: "32px 0 64px" }}>

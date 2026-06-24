@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveProducts, getCategories, getPublishedArticles, getSettings, type HomeArticle } from "@/lib/data";
 import ProductCard from "@/components/ProductCard";
 import CategoryCard from "@/components/CategoryCard";
 import Image from "next/image";
 import { IconLeaf, IconShield, IconTag, IconArrowRight, IconFlask, IconPill, IconPackage, IconStar, IconHeartPulse, IconClock } from "@/components/icons";
-import type { Product } from "@/lib/types";
 
-interface HomeArticle { id: string; title: string; slug: string; excerpt: string | null; cover_image: string | null; read_time_min: number | null; published_at: string | null; }
+export const revalidate = 60;
 
 const STATS = [
   { icon: <IconPackage size={26} color="var(--teal-600)" />, value: "10,000+", label: "กระปุกที่จำหน่ายแล้ว" },
@@ -29,31 +28,28 @@ interface PromoConfig { title?: string; subtitle?: string; cta?: string; show?: 
 interface HomepageConfig { sections?: string[]; hero?: HeroConfig; products?: ProductsConfig; promo?: PromoConfig; }
 
 export default async function HomePage() {
-  const supabase = await createClient();
-
-  const [{ data: rawProducts }, { data: categories }, { data: configRow }, { data: heroRow }, { data: articleRows }] = await Promise.all([
-    supabase.from("products").select("*, categories(id,name,slug)").eq("status", "active").order("created_at", { ascending: false }).limit(9),
-    supabase.from("categories").select("*").order("name"),
-    supabase.from("site_settings").select("value").eq("key", "homepage_config").single(),
-    supabase.from("site_settings").select("value").eq("key", "hero").single(),
-    supabase.from("articles").select("id, title, slug, excerpt, cover_image, read_time_min, published_at").eq("is_published", true).order("published_at", { ascending: false }).limit(4),
+  const [allProducts, categories, allArticles, settings] = await Promise.all([
+    getActiveProducts(),
+    getCategories(),
+    getPublishedArticles(),
+    getSettings(),
   ]);
 
-  const articles = (articleRows ?? []) as HomeArticle[];
+  const rawProducts = allProducts.slice(0, 9);
+  const articles: HomeArticle[] = allArticles.slice(0, 4);
   const pinnedArticle = articles[0];
   const otherArticles = articles.slice(1, 4);
 
-  const config = (configRow?.value ?? {}) as HomepageConfig;
+  const config = (settings.homepage_config ?? {}) as HomepageConfig;
   // hero ทั้งหมด (ข้อความ + รูป) อ่านจาก site_settings key="hero" เพื่อให้หน้า "แบนเนอร์" หลังบ้านคุมได้
-  const heroCfg = (heroRow?.value ?? {}) as HeroConfig;
+  const heroCfg = (settings.hero ?? {}) as HeroConfig;
   const heroImg = heroCfg.image ?? null;
   const sections = config.sections ?? ["hero", "categories", "products", "promo"];
   const hc: HeroConfig = { ...(config.hero ?? {}), ...heroCfg };
   const pc = config.products ?? {};
   const promo = config.promo ?? {};
 
-  const products = (rawProducts ?? []) as Product[];
-  const gridProducts = products.slice(0, 4);
+  const gridProducts = rawProducts.slice(0, 4);
 
   return (
     <>

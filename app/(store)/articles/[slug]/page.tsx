@@ -1,15 +1,17 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { IconClock, IconArrowRight } from "@/components/icons";
 
+export const revalidate = 60;
+
 interface Props { params: Promise<{ slug: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const supabase = await createClient();
+  const supabase = createServiceClient();
   const { data } = await supabase.from("articles").select("title, excerpt, cover_image").eq("slug", slug).single();
   if (!data) return { title: "ไม่พบบทความ" };
   return {
@@ -21,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createClient();
+  const supabase = createServiceClient();
 
   const { data: article } = await supabase
     .from("articles")

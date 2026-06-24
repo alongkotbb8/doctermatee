@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveProducts } from "@/lib/data";
 import AddToCartButton from "@/components/AddToCartButton";
 import { IconPill, IconFlask, IconSparkles, IconBaby, IconHeartPulse, IconLeaf, IconTruck } from "@/components/icons";
 import type { Metadata } from "next";
+
+export const revalidate = 60;
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -11,8 +13,8 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const supabase = await createClient();
-  const { data } = await supabase.from("products").select("name, description").eq("slug", slug).single();
+  const products = await getActiveProducts();
+  const data = products.find((p) => p.slug === slug);
   if (!data) return { title: "ไม่พบสินค้า" };
   return { title: data.name, description: data.description ?? undefined };
 }
@@ -27,14 +29,8 @@ const CAT_ICONS: Record<string, React.ReactNode> = {
 
 export default async function ProductDetailPage({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createClient();
-
-  const { data: product } = await supabase
-    .from("products")
-    .select("*, categories(id,name,slug)")
-    .eq("slug", slug)
-    .eq("status", "active")
-    .single();
+  const products = await getActiveProducts();
+  const product = products.find((p) => p.slug === slug);
 
   if (!product) notFound();
 

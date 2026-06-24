@@ -83,6 +83,7 @@ export default function ProductForm({ categories, product }: Props) {
       const { error: e } = await supabase.from("products").insert(payload);
       if (e) { setError(e.message); setSaving(false); return; }
     }
+    await fetch("/api/revalidate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tags: ["catalog"] }) }).catch(() => {});
     setSaving(false); setSaved(true);
     setTimeout(() => router.push("/admin/products"), 1000);
   }
@@ -91,6 +92,7 @@ export default function ProductForm({ categories, product }: Props) {
     if (!confirm("ลบสินค้านี้?")) return;
     const supabase = createClient();
     await supabase.from("products").delete().eq("id", product!.id!);
+    await fetch("/api/revalidate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tags: ["catalog"] }) }).catch(() => {});
     router.push("/admin/products");
   }
 
