@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import AddToCartButton from "@/components/AddToCartButton";
-import { IconPill, IconFlask, IconSparkles, IconBaby, IconHeartPulse, IconLeaf } from "@/components/icons";
+import { IconPill, IconFlask, IconSparkles, IconBaby, IconHeartPulse, IconLeaf, IconTruck } from "@/components/icons";
 import type { Metadata } from "next";
 
 interface Props {
@@ -144,8 +144,8 @@ export default async function ProductDetailPage({ params }: Props) {
             </div>
 
             {/* Shipping note */}
-            <p style={{ fontSize: 13, color: "var(--neutral-500)", marginTop: 14, textAlign: "center" }}>
-              🚚 จัดส่งฟรีเมื่อสั่งซื้อครบ ฿500
+            <p style={{ fontSize: 13, color: "var(--neutral-500)", marginTop: 14, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+              <IconTruck size={15} color="var(--teal-600)" /> จัดส่งฟรีเมื่อสั่งซื้อครบ ฿500
             </p>
           </div>
         </div>

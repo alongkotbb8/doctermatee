@@ -322,14 +322,35 @@ img { max-width: 100%; display: block; }
   [style*="1.4fr 1fr 1fr 1.2fr"] { grid-template-columns: 1fr !important; }
 }
 
-/* ── Navbar responsive ─────────────────────────────────── */
-@media (max-width: 768px) {
-  .nav-topbar { display: none !important; }
+/* ── Navbar responsive (แถบเดียว + hamburger) ──────────── */
+/* แท็บเล็ตลงไป: ซ่อนลิงก์เดสก์ท็อป + ปรึกษาแพทย์ ใช้ hamburger แทน */
+@media (max-width: 960px) {
+  .nav-links { display: none !important; }
+  .nav-consult { display: none !important; }
+  .nav-hamburger { display: flex !important; }
+}
+/* มือถือ: ซ่อนช่องค้นหาในแถบ (ไปอยู่ใน drawer แทน) */
+@media (max-width: 600px) {
   .nav-search { display: none !important; }
-  .nav-menu { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-  .nav-menu::-webkit-scrollbar { display: none; }
-  .nav-menu > div { flex-wrap: nowrap !important; }
-  .nav-menu a, .nav-menu .nav-consult { white-space: nowrap; }
+}
+
+/* ── หมวดหมู่หน้าแรก: เลื่อนแนวนอนบนมือถือ ไม่ล้นขอบ ──── */
+@media (max-width: 600px) {
+  .cat-grid {
+    display: flex !important;
+    overflow-x: auto;
+    gap: 12px;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .cat-grid::-webkit-scrollbar { display: none; }
+  .cat-grid > * { flex: 0 0 42%; }
+}
+
+/* บทความปักหมุดหน้าแรก: รูป/เนื้อหา ยุบเป็นคอลัมน์เดียวบนมือถือ */
+@media (max-width: 768px) {
+  .pinned-article { grid-template-columns: 1fr !important; }
 }
 
 /* ── Admin responsive ──────────────────────────────────── */

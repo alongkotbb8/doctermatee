@@ -3,8 +3,18 @@ import { createClient } from "@/lib/supabase/server";
 import ProductCard from "@/components/ProductCard";
 import CategoryCard from "@/components/CategoryCard";
 import AddToCartButton from "@/components/AddToCartButton";
-import { IconLeaf, IconShield, IconTag, IconArrowRight, IconFlask, IconPill } from "@/components/icons";
+import Image from "next/image";
+import { IconLeaf, IconShield, IconTag, IconArrowRight, IconFlask, IconPill, IconPackage, IconStar, IconHeartPulse, IconClock } from "@/components/icons";
 import type { Product } from "@/lib/types";
+
+interface HomeArticle { id: string; title: string; slug: string; excerpt: string | null; cover_image: string | null; read_time_min: number | null; published_at: string | null; }
+
+const STATS = [
+  { icon: <IconPackage size={26} color="var(--teal-600)" />, value: "10,000+", label: "กระปุกที่จำหน่ายแล้ว" },
+  { icon: <IconStar size={26} color="var(--teal-600)" />, value: "4.9/5", label: "คะแนนรีวิวเฉลี่ย" },
+  { icon: <IconHeartPulse size={26} color="var(--teal-600)" />, value: "98%", label: "ลูกค้าพึงพอใจ" },
+  { icon: <IconShield size={26} color="var(--teal-600)" />, value: "100%", label: "สินค้ามีเลข อย." },
+];
 
 const CAT_ICON_KEY: Record<string, string> = {
   vitamins: "pill",
@@ -22,12 +32,17 @@ interface HomepageConfig { sections?: string[]; hero?: HeroConfig; products?: Pr
 export default async function HomePage() {
   const supabase = await createClient();
 
-  const [{ data: rawProducts }, { data: categories }, { data: configRow }, { data: heroRow }] = await Promise.all([
+  const [{ data: rawProducts }, { data: categories }, { data: configRow }, { data: heroRow }, { data: articleRows }] = await Promise.all([
     supabase.from("products").select("*, categories(id,name,slug)").eq("status", "active").order("created_at", { ascending: false }).limit(9),
     supabase.from("categories").select("*").order("name"),
     supabase.from("site_settings").select("value").eq("key", "homepage_config").single(),
     supabase.from("site_settings").select("value").eq("key", "hero").single(),
+    supabase.from("articles").select("id, title, slug, excerpt, cover_image, read_time_min, published_at").eq("is_published", true).order("published_at", { ascending: false }).limit(4),
   ]);
+
+  const articles = (articleRows ?? []) as HomeArticle[];
+  const pinnedArticle = articles[0];
+  const otherArticles = articles.slice(1, 4);
 
   const config = (configRow?.value ?? {}) as HomepageConfig;
   const heroImg = (heroRow?.value as { image?: string } | null)?.image ?? null;
@@ -115,11 +130,28 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* ── Stats / social proof ─────────────────────────── */}
+      <section style={{ background: "#fff", padding: "8px 0 4px" }}>
+        <div className="wrap">
+          <div className="stats-bar" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 16, background: "linear-gradient(135deg,var(--green-50),#fff)", border: "1px solid var(--teal-100)", borderRadius: "var(--radius-lg)", padding: "22px 28px" }}>
+            {STATS.map((s) => (
+              <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 12, flex: "1 1 180px", minWidth: 0 }}>
+                <span style={{ width: 48, height: 48, borderRadius: 14, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "var(--shadow-sm)", flexShrink: 0 }}>{s.icon}</span>
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 22, color: "var(--neutral-900)", letterSpacing: "-.02em" }}>{s.value}</p>
+                  <p style={{ margin: 0, fontSize: 12.5, color: "var(--neutral-500)" }}>{s.label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Categories ───────────────────────────────────── */}
       {sections.includes("categories") && (
         <section style={{ background: "#fff", padding: "32px 0" }}>
           <div className="wrap">
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 14 }}>
+            <div className="cat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 14 }}>
               {categories?.map((cat, i) => (
                 <div key={cat.id} className={`anim-pop-in d${Math.min(i + 1, 5)}`}>
                   <CategoryCard href={`/products?category=${cat.slug}`} iconKey={CAT_ICON_KEY[cat.slug] ?? "pill"} name={cat.name} />
@@ -215,6 +247,75 @@ export default async function HomePage() {
                 ))}
               </div>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Articles: pinned + cards ─────────────────────── */}
+      {pinnedArticle && (
+        <section style={{ padding: "8px 0 56px" }}>
+          <div className="wrap">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+              <div>
+                <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 28, letterSpacing: "-.02em", color: "var(--neutral-900)" }}>บทความสุขภาพ</h2>
+                <p style={{ color: "var(--neutral-500)", fontSize: 14, marginTop: 4 }}>ความรู้และเคล็ดลับดูแลสุขภาพจากผู้เชี่ยวชาญ</p>
+              </div>
+              <Link href="/articles" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "var(--teal-700)", textDecoration: "none" }}>
+                ดูทั้งหมด <IconArrowRight size={14} color="var(--teal-700)" />
+              </Link>
+            </div>
+
+            {/* Pinned (ปักหมุด) */}
+            <Link href={`/articles/${pinnedArticle.slug}`} style={{ textDecoration: "none", display: "block" }} className="anim-fade-up">
+              <article className="featured-hover card pinned-article" style={{ display: "grid", gridTemplateColumns: "1.05fr 1fr", overflow: "hidden", marginBottom: otherArticles.length ? 20 : 0, borderColor: "var(--teal-100)" }}>
+                <div style={{ position: "relative", minHeight: 280, background: "linear-gradient(145deg,var(--green-50),var(--teal-50))" }}>
+                  {pinnedArticle.cover_image ? (
+                    <Image src={pinnedArticle.cover_image} alt={pinnedArticle.title} fill style={{ objectFit: "cover" }} sizes="(max-width:768px) 100vw, 560px" />
+                  ) : (
+                    <div style={{ width: "100%", height: "100%", minHeight: 280, display: "flex", alignItems: "center", justifyContent: "center" }}><IconFlask size={72} color="var(--teal-300)" /></div>
+                  )}
+                  <span style={{ position: "absolute", top: 16, left: 16, background: "var(--teal-600)", color: "#fff", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 12, padding: "5px 14px", borderRadius: "var(--radius-full)" }}>
+                    ★ บทความแนะนำ
+                  </span>
+                </div>
+                <div style={{ padding: "32px 32px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--neutral-400)", fontSize: 12, marginBottom: 12 }}>
+                    <IconClock size={13} color="currentColor" /> {pinnedArticle.read_time_min ?? 5} นาที
+                    {pinnedArticle.published_at && <span>· {new Date(pinnedArticle.published_at).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" })}</span>}
+                  </div>
+                  <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 24, lineHeight: 1.3, color: "var(--neutral-900)", margin: "0 0 12px", letterSpacing: "-.01em" }}>{pinnedArticle.title}</h3>
+                  {pinnedArticle.excerpt && <p style={{ fontSize: 14.5, color: "var(--neutral-500)", lineHeight: 1.8, margin: "0 0 20px" }}>{pinnedArticle.excerpt}</p>}
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 7, alignSelf: "flex-start", background: "var(--teal-600)", color: "#fff", borderRadius: "var(--radius-full)", padding: "10px 22px", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14 }}>
+                    อ่านบทความ <IconArrowRight size={14} color="#fff" />
+                  </span>
+                </div>
+              </article>
+            </Link>
+
+            {/* Other articles */}
+            {otherArticles.length > 0 && (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
+                {otherArticles.map((a, i) => (
+                  <Link key={a.id} href={`/articles/${a.slug}`} style={{ textDecoration: "none" }} className={`anim-fade-up d${Math.min(i + 1, 5)}`}>
+                    <article className="card pcard-hover" style={{ overflow: "hidden", height: "100%", display: "flex", flexDirection: "column" }}>
+                      <div style={{ height: 160, background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", position: "relative", flexShrink: 0 }}>
+                        {a.cover_image ? (
+                          <Image src={a.cover_image} alt={a.title} fill style={{ objectFit: "cover" }} sizes="(max-width:768px) 100vw, 360px" />
+                        ) : (
+                          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><IconPill size={40} color="var(--teal-300)" /></div>
+                        )}
+                      </div>
+                      <div style={{ padding: "16px 18px", flex: 1, display: "flex", flexDirection: "column" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 5, color: "var(--neutral-400)", fontSize: 12, marginBottom: 8 }}>
+                          <IconClock size={12} color="currentColor" /> {a.read_time_min ?? 5} นาที
+                        </div>
+                        <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "var(--neutral-900)", margin: 0, lineHeight: 1.4 }}>{a.title}</h3>
+                      </div>
+                    </article>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       )}
