@@ -327,6 +327,7 @@ img { max-width: 100%; display: block; }
 @media (max-width: 860px) {
   [style*="repeat(3,1fr)"],
   [style*="repeat(3, 1fr)"] { grid-template-columns: repeat(2, 1fr) !important; }
+  [style*="repeat(4,1fr)"] { grid-template-columns: repeat(2, 1fr) !important; }
   [style*="repeat(5,1fr)"] { grid-template-columns: repeat(3, 1fr) !important; }
   [style*="1.4fr 1fr 1fr 1.2fr"] { grid-template-columns: repeat(2, 1fr) !important; }
   .grid-12 { gap: 24px; }
@@ -336,6 +337,7 @@ img { max-width: 100%; display: block; }
 
 /* container: ลดระยะขอบลงตามจอ (ตั้งต้น 80px) */
 @media (max-width: 1100px) { .wrap { padding-left: 48px; padding-right: 48px; } }
+@media (min-width: 861px) and (max-width: 1100px) { [style*="repeat(4,1fr)"] { grid-template-columns: repeat(3, 1fr) !important; } }
 @media (max-width: 768px)  { .wrap { padding-left: 28px; padding-right: 28px; } }
 @media (max-width: 480px)  { .wrap { padding-left: 18px; padding-right: 18px; } }
 
@@ -368,6 +370,7 @@ img { max-width: 100%; display: block; }
 @media (max-width: 560px) {
   [style*="repeat(3,1fr)"],
   [style*="repeat(3, 1fr)"] { grid-template-columns: 1fr !important; }
+  [style*="repeat(4,1fr)"] { grid-template-columns: 1fr !important; }
   [style*="repeat(5,1fr)"] { grid-template-columns: repeat(2, 1fr) !important; }
   [style*="1.4fr 1fr 1fr 1.2fr"] { grid-template-columns: 1fr !important; }
 }
