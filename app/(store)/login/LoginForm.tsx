@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { IconMail, IconShield } from "@/components/icons";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -34,18 +33,13 @@ export default function LoginForm() {
     <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
       <div>
         <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--neutral-700)", marginBottom: 6 }}>อีเมล</label>
-        <div style={{ position: "relative" }}>
-          <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}>
-            <IconMail size={16} color="var(--neutral-400)" />
-          </span>
-          <input
-            type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-            placeholder="example@email.com"
-            style={{ width: "100%", height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", paddingLeft: 38, paddingRight: 14, fontSize: 14, fontFamily: "var(--font-body)", outline: "none", transition: "border-color .2s, box-shadow .2s", background: "#fff" }}
-            onFocus={(e) => { e.target.style.borderColor = "var(--color-primary)"; e.target.style.boxShadow = "var(--focus-ring)"; }}
-            onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; e.target.style.boxShadow = "none"; }}
-          />
-        </div>
+        <input
+          type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+          placeholder="example@email.com"
+          style={{ width: "100%", height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", padding: "0 16px", fontSize: 14, fontFamily: "var(--font-body)", outline: "none", transition: "border-color .2s, box-shadow .2s", background: "#fff" }}
+          onFocus={(e) => { e.target.style.borderColor = "var(--color-primary)"; e.target.style.boxShadow = "var(--focus-ring)"; }}
+          onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; e.target.style.boxShadow = "none"; }}
+        />
       </div>
 
       <div>
@@ -53,18 +47,13 @@ export default function LoginForm() {
           <label style={{ fontSize: 13, fontWeight: 600, color: "var(--neutral-700)" }}>รหัสผ่าน</label>
           <Link href="/forgot-password" style={{ fontSize: 12, color: "var(--teal-600)", fontWeight: 600, textDecoration: "none" }}>ลืมรหัสผ่าน?</Link>
         </div>
-        <div style={{ position: "relative" }}>
-          <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}>
-            <IconShield size={16} color="var(--neutral-400)" />
-          </span>
-          <input
-            type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            style={{ width: "100%", height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", paddingLeft: 38, paddingRight: 14, fontSize: 14, fontFamily: "var(--font-body)", outline: "none", transition: "border-color .2s, box-shadow .2s", background: "#fff" }}
-            onFocus={(e) => { e.target.style.borderColor = "var(--color-primary)"; e.target.style.boxShadow = "var(--focus-ring)"; }}
-            onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; e.target.style.boxShadow = "none"; }}
-          />
-        </div>
+        <input
+          type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+          style={{ width: "100%", height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", padding: "0 16px", fontSize: 14, fontFamily: "var(--font-body)", outline: "none", transition: "border-color .2s, box-shadow .2s", background: "#fff" }}
+          onFocus={(e) => { e.target.style.borderColor = "var(--color-primary)"; e.target.style.boxShadow = "var(--focus-ring)"; }}
+          onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; e.target.style.boxShadow = "none"; }}
+        />
       </div>
 
       {error && (

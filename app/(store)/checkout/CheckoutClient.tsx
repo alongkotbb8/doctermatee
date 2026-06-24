@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { useCart } from "@/store/cart";
 import { createClient } from "@/lib/supabase/client";
-import { IconTag, IconTruck, IconUser, IconPhone, IconMail, IconShield, IconPill } from "@/components/icons";
+import { IconTag, IconTruck, IconShield, IconPill } from "@/components/icons";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -128,9 +128,9 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
   const inputStyle = {
     width: "100%", height: 44,
     border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)",
-    paddingLeft: 38, paddingRight: 14, fontSize: 14, fontFamily: "var(--font-body)", outline: "none",
+    padding: "0 16px", fontSize: 14, fontFamily: "var(--font-body)", outline: "none",
   };
-  const inputNoIconStyle = { ...inputStyle, paddingLeft: 14 };
+  const inputNoIconStyle = inputStyle;
 
   // ไฮไลต์ช่องที่กรอกไม่ครบเป็นสีแดง
   const fieldStyle = (key: string, base: React.CSSProperties) => ({
@@ -160,31 +160,22 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
                 {/* full name */}
                 <div style={{ gridColumn: "1 / -1" }}>
                   <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 5 }}>ชื่อ-นามสกุล *</label>
-                  <div style={{ position: "relative" }}>
-                    <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}><IconUser size={15} color="var(--neutral-400)" /></span>
-                    <input value={fullName} onChange={(e) => { setFullName(e.target.value); clearErr("fullName"); }} style={fieldStyle("fullName", inputStyle)} placeholder="สมชาย ใจดี"
-                      onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={onBlurField("fullName")} />
-                  </div>
+                  <input value={fullName} onChange={(e) => { setFullName(e.target.value); clearErr("fullName"); }} style={fieldStyle("fullName", inputStyle)} placeholder="สมชาย ใจดี"
+                    onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={onBlurField("fullName")} />
                 </div>
 
                 {/* phone */}
                 <div>
                   <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 5 }}>เบอร์โทร *</label>
-                  <div style={{ position: "relative" }}>
-                    <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}><IconPhone size={15} color="var(--neutral-400)" /></span>
-                    <input value={phone} onChange={(e) => { setPhone(e.target.value); clearErr("phone"); }} style={fieldStyle("phone", inputStyle)} placeholder="08X-XXX-XXXX"
-                      onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={onBlurField("phone")} />
-                  </div>
+                  <input value={phone} onChange={(e) => { setPhone(e.target.value); clearErr("phone"); }} style={fieldStyle("phone", inputStyle)} placeholder="08X-XXX-XXXX"
+                    onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={onBlurField("phone")} />
                 </div>
 
                 {/* email */}
                 <div>
                   <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 5 }}>อีเมล *</label>
-                  <div style={{ position: "relative" }}>
-                    <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}><IconMail size={15} color="var(--neutral-400)" /></span>
-                    <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); clearErr("email"); }} style={fieldStyle("email", inputStyle)} placeholder="example@email.com"
-                      onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={onBlurField("email")} />
-                  </div>
+                  <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); clearErr("email"); }} style={fieldStyle("email", inputStyle)} placeholder="example@email.com"
+                    onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={onBlurField("email")} />
                 </div>
 
                 {/* address */}

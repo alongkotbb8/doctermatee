@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
-import { IconUser, IconMail, IconPhone, IconShield, IconArrowRight } from "@/components/icons";
+import { IconUser, IconShield, IconArrowRight } from "@/components/icons";
 import Link from "next/link";
 
 const STATUS_LABEL: Record<string, { label: string; color: string; bg: string }> = {
@@ -106,27 +106,21 @@ export default function AccountClient({ user, profile, orders }: Props) {
         {tab === "profile" && (
           <div className="anim-fade-up card" style={{ padding: "28px 24px", display: "flex", flexDirection: "column", gap: 18 }}>
             {[
-              { label: "ชื่อ-นามสกุล", icon: <IconUser size={15} color="var(--neutral-400)" />, value: fullName, set: setFullName, type: "text", placeholder: "สมชาย ใจดี" },
-              { label: "เบอร์โทรศัพท์", icon: <IconPhone size={15} color="var(--neutral-400)" />, value: phone, set: setPhone, type: "tel", placeholder: "08X-XXX-XXXX" },
-            ].map(({ label, icon, value, set, type, placeholder }) => (
+              { label: "ชื่อ-นามสกุล", value: fullName, set: setFullName, type: "text", placeholder: "สมชาย ใจดี" },
+              { label: "เบอร์โทรศัพท์", value: phone, set: setPhone, type: "tel", placeholder: "08X-XXX-XXXX" },
+            ].map(({ label, value, set, type, placeholder }) => (
               <div key={label}>
                 <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--neutral-700)", marginBottom: 6 }}>{label}</label>
-                <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}>{icon}</span>
-                  <input type={type} value={value} onChange={(e) => set(e.target.value)} placeholder={placeholder}
-                    style={{ width: "100%", height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", paddingLeft: 36, paddingRight: 14, fontSize: 14, fontFamily: "var(--font-body)", outline: "none" }}
-                    onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; e.target.style.boxShadow = "var(--focus-ring)"; }}
-                    onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; e.target.style.boxShadow = "none"; }}
-                  />
-                </div>
+                <input type={type} value={value} onChange={(e) => set(e.target.value)} placeholder={placeholder}
+                  style={{ width: "100%", height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", padding: "0 16px", fontSize: 14, fontFamily: "var(--font-body)", outline: "none" }}
+                  onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; e.target.style.boxShadow = "var(--focus-ring)"; }}
+                  onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; e.target.style.boxShadow = "none"; }}
+                />
               </div>
             ))}
             <div>
               <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--neutral-700)", marginBottom: 6 }}>อีเมล</label>
-              <div style={{ position: "relative" }}>
-                <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}><IconMail size={15} color="var(--neutral-300)" /></span>
-                <input disabled value={user.email ?? ""} style={{ width: "100%", height: 44, border: "1px solid var(--neutral-100)", borderRadius: "var(--radius-input)", paddingLeft: 36, paddingRight: 14, fontSize: 14, fontFamily: "var(--font-body)", background: "var(--neutral-50)", color: "var(--neutral-400)" }} />
-              </div>
+              <input disabled value={user.email ?? ""} style={{ width: "100%", height: 44, border: "1px solid var(--neutral-100)", borderRadius: "var(--radius-input)", padding: "0 16px", fontSize: 14, fontFamily: "var(--font-body)", background: "var(--neutral-50)", color: "var(--neutral-400)" }} />
               <p style={{ fontSize: 12, color: "var(--neutral-400)", marginTop: 4 }}>ไม่สามารถเปลี่ยนอีเมลได้</p>
             </div>
             <button onClick={saveProfile} disabled={saving} className="btn-pop"
@@ -148,7 +142,7 @@ export default function AccountClient({ user, profile, orders }: Props) {
               <div key={label}>
                 <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--neutral-700)", marginBottom: 6 }}>{label}</label>
                 <input type="text" value={value} onChange={(e) => set(e.target.value)} placeholder={placeholder}
-                  style={{ width: "100%", height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", paddingLeft: 14, paddingRight: 14, fontSize: 14, fontFamily: "var(--font-body)", outline: "none" }}
+                  style={{ width: "100%", height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", padding: "0 16px", fontSize: 14, fontFamily: "var(--font-body)", outline: "none" }}
                   onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; e.target.style.boxShadow = "var(--focus-ring)"; }}
                   onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; e.target.style.boxShadow = "none"; }}
                 />
