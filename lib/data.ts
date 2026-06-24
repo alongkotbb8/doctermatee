@@ -50,6 +50,27 @@ export const getPublishedArticles = unstable_cache(
   { revalidate: 60, tags: ["articles"] }
 );
 
+export interface Banner {
+  id: string; title: string | null; accent: string | null; subtitle: string | null;
+  image: string | null; cta_primary: string | null; cta_primary_href: string | null;
+  cta_secondary: string | null; cta_secondary_href: string | null;
+  is_active: boolean; sort_order: number;
+}
+
+export const getActiveBanners = unstable_cache(
+  async (): Promise<Banner[]> => {
+    const s = createServiceClient();
+    const { data } = await s
+      .from("banners")
+      .select("id, title, accent, subtitle, image, cta_primary, cta_primary_href, cta_secondary, cta_secondary_href, is_active, sort_order")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true });
+    return (data ?? []) as Banner[];
+  },
+  ["active-banners"],
+  { revalidate: 60, tags: ["banners"] }
+);
+
 export const getSettings = unstable_cache(
   async (): Promise<Record<string, Record<string, unknown>>> => {
     const s = createServiceClient();

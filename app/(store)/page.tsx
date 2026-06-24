@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { getActiveProducts, getCategories, getPublishedArticles, getSettings, type HomeArticle } from "@/lib/data";
+import { getActiveProducts, getCategories, getPublishedArticles, getSettings, getActiveBanners, type HomeArticle } from "@/lib/data";
 import ProductCard from "@/components/ProductCard";
 import CategoryCard from "@/components/CategoryCard";
+import HeroCarousel from "@/components/HeroCarousel";
 import Image from "next/image";
 import { IconLeaf, IconShield, IconTag, IconArrowRight, IconFlask, IconPill, IconPackage, IconStar, IconHeartPulse, IconClock } from "@/components/icons";
 
@@ -28,11 +29,12 @@ interface PromoConfig { title?: string; subtitle?: string; cta?: string; show?: 
 interface HomepageConfig { sections?: string[]; hero?: HeroConfig; products?: ProductsConfig; promo?: PromoConfig; }
 
 export default async function HomePage() {
-  const [allProducts, categories, allArticles, settings] = await Promise.all([
+  const [allProducts, categories, allArticles, settings, banners] = await Promise.all([
     getActiveProducts(),
     getCategories(),
     getPublishedArticles(),
     getSettings(),
+    getActiveBanners(),
   ]);
 
   const rawProducts = allProducts.slice(0, 9);
@@ -54,7 +56,9 @@ export default async function HomePage() {
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────── */}
-      {sections.includes("hero") && (
+      {sections.includes("hero") && banners.length > 0 && <HeroCarousel banners={banners} />}
+
+      {sections.includes("hero") && banners.length === 0 && (
         <section style={{ background: "var(--gradient-hero)", overflow: "hidden" }}>
           <div className="wrap grid-12" style={{ alignItems: "center", gap: 48, paddingTop: 60, paddingBottom: 68 }}>
 
