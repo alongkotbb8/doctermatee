@@ -131,12 +131,12 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
 
   return (
     <div style={{ padding: "36px 0 64px", background: "var(--neutral-50)", minHeight: "80vh" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
+      <div className="wrap">
         <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 26, color: "var(--neutral-900)", marginBottom: 28 }}>ชำระเงิน</h1>
 
-        <form onSubmit={handleSubmit} style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 24, alignItems: "start" }}>
+        <form onSubmit={handleSubmit} className="grid-12" style={{ gap: 24 }}>
           {/* Left — shipping form */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div className="col-8" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
             {/* Shipping address card */}
             <div className="card" style={{ padding: "24px 22px" }}>
@@ -249,7 +249,7 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
           </div>
 
           {/* Right — order summary */}
-          <div style={{ position: "sticky", top: 90 }}>
+          <div className="col-4" style={{ position: "sticky", top: 90 }}>
             <div className="card" style={{ padding: "22px 20px" }}>
               <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, color: "var(--neutral-800)", marginBottom: 16 }}>สรุปออเดอร์</h2>
 
@@ -308,12 +308,6 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
           </div>
         </form>
       </div>
-
-      <style>{`
-        @media (max-width: 768px) {
-          form { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </div>
   );
 }

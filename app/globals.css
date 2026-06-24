@@ -167,6 +167,31 @@ img { max-width: 100%; display: block; }
 }
 
 /* ============================================================
+   Layout — container + ระบบกริด 12 ช่อง (ใช้ทั้งเว็บ)
+   ============================================================ */
+.wrap {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.col-3  { grid-column: span 3; }
+.col-4  { grid-column: span 4; }
+.col-5  { grid-column: span 5; }
+.col-6  { grid-column: span 6; }
+.col-7  { grid-column: span 7; }
+.col-8  { grid-column: span 8; }
+.col-9  { grid-column: span 9; }
+.col-12 { grid-column: span 12; }
+
+/* ============================================================
    Motion & Animation
    ============================================================ */
 
@@ -304,9 +329,18 @@ img { max-width: 100%; display: block; }
   [style*="repeat(3, 1fr)"] { grid-template-columns: repeat(2, 1fr) !important; }
   [style*="repeat(5,1fr)"] { grid-template-columns: repeat(3, 1fr) !important; }
   [style*="1.4fr 1fr 1fr 1.2fr"] { grid-template-columns: repeat(2, 1fr) !important; }
-  .wrap { padding-left: 16px !important; padding-right: 16px !important; }
+  .wrap { padding-left: 24px; padding-right: 24px; }
+  .grid-12 { gap: 20px; }
   /* ตารางแอดมินเลื่อนแนวนอนได้ */
   .card > table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+
+/* กริด 12 ช่อง: ยุบเป็นคอลัมน์เดียวบนมือถือ */
+@media (max-width: 768px) {
+  .grid-12 > * { grid-column: 1 / -1 !important; }
+}
+@media (max-width: 560px) {
+  .wrap { padding-left: 16px; padding-right: 16px; }
 }
 
 /* มือถือใหญ่: ยุบ hero / ฟอร์มคู่ 1fr 1fr และราคา 3 ช่อง → 1 คอลัมน์ */

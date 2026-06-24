@@ -35,9 +35,9 @@ export default async function ProductsPage({ searchParams }: Props) {
           <p style={{ color: "var(--neutral-500)", marginTop: 4 }}>พบ {products?.length ?? 0} รายการ</p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 32 }}>
+        <div className="grid-12" style={{ gap: 32 }}>
           {/* Sidebar */}
-          <aside>
+          <aside className="col-3">
             <div style={{ background: "#fff", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-md)", padding: "20px 18px", boxShadow: "var(--shadow-sm)" }}>
               <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "var(--neutral-900)", marginBottom: 14 }}>หมวดหมู่</h3>
               <ul style={{ listStyle: "none", padding: 0 }}>
@@ -58,7 +58,7 @@ export default async function ProductsPage({ searchParams }: Props) {
           </aside>
 
           {/* Grid */}
-          <div>
+          <div className="col-9">
             {products && products.length > 0 ? (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
                 {products.map((p) => (
@@ -74,7 +74,6 @@ export default async function ProductsPage({ searchParams }: Props) {
           </div>
         </div>
       </div>
-      <style>{`.wrap{max-width:1180px;margin:0 auto;padding:0 24px}`}</style>
     </div>
   );
 }

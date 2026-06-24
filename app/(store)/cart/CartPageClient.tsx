@@ -77,9 +77,9 @@ export default function CartPageClient({ freeThreshold = 500, standardFee = 50 }
           </button>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 28 }}>
+        <div className="grid-12" style={{ gap: 28 }}>
           {/* Item list */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className="col-8" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {items.map((item) => (
               <div key={item.id} className="anim-fade-up" style={{ display: "flex", gap: 16, padding: 18, background: "#fff", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-sm)", alignItems: "center" }}>
                 {/* Image */}
@@ -128,8 +128,8 @@ export default function CartPageClient({ freeThreshold = 500, standardFee = 50 }
           </div>
 
           {/* Summary */}
-          <div>
-            <div style={{ background: "#fff", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-sm)", padding: "24px 22px", position: "sticky", top: 72 }}>
+          <div className="col-4">
+            <div style={{ background: "#fff", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-sm)", padding: "24px 22px", position: "sticky", top: 90 }}>
               <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 17, color: "var(--neutral-900)", marginBottom: 18 }}>สรุปคำสั่งซื้อ</h3>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 16 }}>
@@ -186,8 +186,6 @@ export default function CartPageClient({ freeThreshold = 500, standardFee = 50 }
           </div>
         </div>
       </div>
-
-      <style>{`.wrap{max-width:1180px;margin:0 auto;padding:0 24px}`}</style>
     </div>
   );
 }

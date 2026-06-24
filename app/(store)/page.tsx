@@ -64,10 +64,10 @@ export default async function HomePage() {
       {/* ── Hero ─────────────────────────────────────────── */}
       {sections.includes("hero") && (
         <section style={{ background: "var(--gradient-hero)", overflow: "hidden" }}>
-          <div className="wrap" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center", padding: "52px 24px 60px" }}>
+          <div className="wrap grid-12" style={{ alignItems: "center", gap: 48, paddingTop: 60, paddingBottom: 68 }}>
 
             {/* Left copy */}
-            <div>
+            <div className="col-7">
               <span className="anim-fade-up d1" style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#fff", color: "var(--teal-700)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 12, padding: "6px 14px", borderRadius: "var(--radius-full)", boxShadow: "var(--shadow-sm)", marginBottom: 20 }}>
                 <IconLeaf size={13} color="var(--teal-600)" /> สินค้าคุณภาพสูง มีเลข อย.
               </span>
@@ -104,7 +104,7 @@ export default async function HomePage() {
             </div>
 
             {/* Right — image or bottle */}
-            <div className="anim-fade-in d2" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 340, position: "relative" }}>
+            <div className="col-5 anim-fade-in d2" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 340, position: "relative" }}>
               {heroImg ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={heroImg} alt="Hero" style={{ width: "100%", maxHeight: 380, objectFit: "contain", borderRadius: "var(--radius-lg)" }} />
@@ -167,10 +167,10 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 22 }}>
+            <div className="grid-12" style={{ gap: 22 }}>
               {/* Featured — left */}
               {featuredProduct && (
-                <Link href={`/products/${featuredProduct.slug}`} style={{ textDecoration: "none", display: "block" }} className="anim-fade-up">
+                <Link href={`/products/${featuredProduct.slug}`} style={{ textDecoration: "none", display: "block" }} className="col-4 anim-fade-up">
                   <article className="featured-hover card" style={{ height: "100%", display: "flex", flexDirection: "column", borderColor: "var(--teal-100)", background: "linear-gradient(145deg,#ECFDF5,#fff)" }}>
                     <div style={{ flex: 1, minHeight: 280, background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", padding: 24 }}>
                       {featuredProduct.images[0] ? (
@@ -226,7 +226,7 @@ export default async function HomePage() {
               )}
 
               {/* Grid — right */}
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, alignContent: "start" }}>
+              <div className="col-8" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, alignContent: "start" }}>
                 {gridProducts.map((p, i) => (
                   <div key={p.id} className={`anim-fade-up d${Math.min(i + 1, 5)}`}>
                     <ProductCard product={p} />
@@ -341,8 +341,6 @@ export default async function HomePage() {
           </div>
         </section>
       )}
-
-      <style>{`.wrap{max-width:1180px;margin:0 auto;padding:0 24px}`}</style>
     </>
   );
 }

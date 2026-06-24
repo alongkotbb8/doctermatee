@@ -150,7 +150,6 @@ export default async function ProductDetailPage({ params }: Props) {
           </div>
         </div>
       </div>
-      <style>{`.wrap{max-width:1180px;margin:0 auto;padding:0 24px}`}</style>
     </div>
   );
 }
