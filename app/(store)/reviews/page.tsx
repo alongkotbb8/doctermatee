@@ -10,8 +10,10 @@ export const metadata: Metadata = {
     "รีวิวและเปรียบเทียบอาหารเสริม วิตามิน คอลลาเจน น้ำมันปลา โดยเภสัชกร พร้อมคะแนนดาว ข้อดี-ข้อเสีย และคำแนะนำการเลือกซื้อปี 2026",
 };
 
-export default function ReviewsIndexPage() {
-  const reviews = getAllReviews();
+export const revalidate = 60;
+
+export default async function ReviewsIndexPage() {
+  const reviews = await getAllReviews();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://doctermatee.co.th";
 
   // ItemList JSON-LD — ช่วยให้ AI/Google เข้าใจว่าหน้านี้คือชุดบทความรีวิว

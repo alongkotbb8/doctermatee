@@ -1,5 +1,10 @@
 // ── รีวิว/เปรียบเทียบสินค้า — ออกแบบเพื่อ AEO/GEO (ให้ AI search อ้างอิงได้) ──
-// เก็บแบบ file-based: เนื้อหาเปลี่ยนไม่บ่อย, static เต็มตัว = โหลดเร็ว + crawl ง่าย
+// ดึงจาก Supabase (จัดการผ่าน /admin) + cache ด้วย unstable_cache (tag "reviews")
+// ถ้า DB ยังไม่มีตาราง (ยังไม่ได้รัน migration 008) จะ fallback เป็นข้อมูล seed ด้านล่าง
+// เพื่อให้เว็บทำงานต่อได้ — เมื่อ apply migration แล้วจะใช้ข้อมูลจาก DB อัตโนมัติ
+
+import { unstable_cache } from "next/cache";
+import { createServiceClient } from "@/lib/supabase/server";
 
 export interface ReviewProduct {
   rank: number;
@@ -40,7 +45,80 @@ export interface Review {
   verdict: string;        // บทสรุป
 }
 
-export const REVIEWS: Review[] = [
+// แถวจาก DB (snake_case + jsonb)
+interface ReviewRow {
+  slug: string;
+  question: string;
+  category: string;
+  summary: string;
+  intro: string | null;
+  author: string | null;
+  author_role: string | null;
+  products: ReviewProduct[] | null;
+  comparison_note: string | null;
+  sections: ReviewSection[] | null;
+  faq: ReviewFAQ[] | null;
+  verdict: string | null;
+  published_at: string | null;
+  updated_at: string | null;
+  created_at: string;
+}
+
+function mapRow(r: ReviewRow): Review {
+  return {
+    slug: r.slug,
+    question: r.question,
+    category: r.category,
+    summary: r.summary,
+    intro: r.intro ?? "",
+    author: r.author ?? "Doctermatee",
+    authorRole: r.author_role ?? "",
+    datePublished: r.published_at ?? r.created_at,
+    dateUpdated: r.updated_at ?? r.published_at ?? r.created_at,
+    products: r.products ?? [],
+    comparisonNote: r.comparison_note ?? undefined,
+    sections: r.sections ?? [],
+    faq: r.faq ?? [],
+    verdict: r.verdict ?? "",
+  };
+}
+
+// ── ดึงรีวิวที่เผยแพร่ทั้งหมด (cache 60s, fallback ถ้า DB ไม่พร้อม) ──
+const fetchReviews = unstable_cache(
+  async (): Promise<Review[]> => {
+    try {
+      const s = createServiceClient();
+      const { data, error } = await s
+        .from("reviews")
+        .select("*")
+        .eq("is_published", true)
+        .order("updated_at", { ascending: false });
+      if (error || !data) return FALLBACK_REVIEWS; // ตารางยังไม่มี/อ่านไม่ได้
+      return (data as ReviewRow[]).map(mapRow);    // DB พร้อม (อาจว่างได้ถ้าแอดมินยังไม่เผยแพร่)
+    } catch {
+      return FALLBACK_REVIEWS;
+    }
+  },
+  ["published-reviews"],
+  { revalidate: 60, tags: ["reviews"] }
+);
+
+export async function getAllReviews(): Promise<Review[]> {
+  return fetchReviews();
+}
+
+export async function getReview(slug: string): Promise<Review | undefined> {
+  const all = await fetchReviews();
+  return all.find((r) => r.slug === slug);
+}
+
+export async function getFeaturedReviews(n = 3): Promise<Review[]> {
+  return (await fetchReviews()).slice(0, n);
+}
+
+// ── ข้อมูล seed สำรอง (ใช้เฉพาะกรณี DB ยังไม่พร้อม) ──
+// ตรงกับที่ seed ไว้ใน migration 20260625000008_reviews.sql
+export const FALLBACK_REVIEWS: Review[] = [
   {
     slug: "vitamin-c-yi-ho-nai-di-2026",
     question: "วิตามินซียี่ห้อไหนดีที่สุดในปี 2026?",
@@ -54,59 +132,17 @@ export const REVIEWS: Review[] = [
     datePublished: "2026-01-15",
     dateUpdated: "2026-06-20",
     products: [
-      {
-        rank: 1, name: "Doctermatee Vita-C 1000", price: "฿590", rating: 4.9,
-        bestFor: "คุ้มค่าที่สุด · ไม่กัดกระเพาะ", highlight: true,
-        productHref: "/products?q=วิตามินซี",
-        pros: ["Sodium Ascorbate ไม่ระคายกระเพาะ", "ปลดปล่อยช้า อยู่ในเลือดนาน", "มีเลข อย. ชัดเจน", "ราคาต่อเม็ดถูกที่สุดในกลุ่ม"],
-        cons: ["เม็ดค่อนข้างใหญ่"],
-      },
-      {
-        rank: 2, name: "ยี่ห้อ A Liposomal C", price: "฿1,290", rating: 4.6,
-        bestFor: "ดูดซึมสูงสุด (เทคโนโลยี liposome)",
-        pros: ["ดูดซึมสูงด้วยเทคโนโลยี liposomal", "เหมาะกับคนต้องการโดสสูง"],
-        cons: ["ราคาสูงกว่าค่าเฉลี่ยมาก", "รสชาติเฉพาะตัว"],
-      },
-      {
-        rank: 3, name: "ยี่ห้อ B Acerola C", price: "฿650", rating: 4.4,
-        bestFor: "วิตามินซีจากธรรมชาติ (อะเซโรลา)",
-        pros: ["สกัดจากผลอะเซโรลา", "มีไบโอฟลาโวนอยด์เสริม"],
-        cons: ["ปริมาณต่อเม็ดต่ำกว่า (500 มก.)", "ต้องกินวันละ 2 เม็ด"],
-      },
-      {
-        rank: 4, name: "ยี่ห้อ C Effervescent", price: "฿420", rating: 4.1,
-        bestFor: "เม็ดฟู่ ดื่มง่าย",
-        pros: ["ละลายน้ำ ดื่มง่าย", "ราคาประหยัด"],
-        cons: ["มีโซเดียม/น้ำตาลแฝง", "ต้องชงทุกครั้ง"],
-      },
-      {
-        rank: 5, name: "ยี่ห้อ D Ascorbic Acid", price: "฿350", rating: 3.8,
-        bestFor: "ราคาถูกที่สุด",
-        pros: ["ราคาต่ำสุด", "หาซื้อง่าย"],
-        cons: ["กรดแอสคอร์บิกอาจกัดกระเพาะ", "ไม่มีระบบปลดปล่อยช้า"],
-      },
+      { rank: 1, name: "Doctermatee Vita-C 1000", price: "฿590", rating: 4.9, bestFor: "คุ้มค่าที่สุด · ไม่กัดกระเพาะ", highlight: true, productHref: "/products?q=วิตามินซี", pros: ["Sodium Ascorbate ไม่ระคายกระเพาะ", "ปลดปล่อยช้า อยู่ในเลือดนาน", "มีเลข อย. ชัดเจน", "ราคาต่อเม็ดถูกที่สุดในกลุ่ม"], cons: ["เม็ดค่อนข้างใหญ่"] },
+      { rank: 2, name: "ยี่ห้อ A Liposomal C", price: "฿1,290", rating: 4.6, bestFor: "ดูดซึมสูงสุด (เทคโนโลยี liposome)", pros: ["ดูดซึมสูงด้วยเทคโนโลยี liposomal", "เหมาะกับคนต้องการโดสสูง"], cons: ["ราคาสูงกว่าค่าเฉลี่ยมาก", "รสชาติเฉพาะตัว"] },
+      { rank: 3, name: "ยี่ห้อ B Acerola C", price: "฿650", rating: 4.4, bestFor: "วิตามินซีจากธรรมชาติ (อะเซโรลา)", pros: ["สกัดจากผลอะเซโรลา", "มีไบโอฟลาโวนอยด์เสริม"], cons: ["ปริมาณต่อเม็ดต่ำกว่า (500 มก.)", "ต้องกินวันละ 2 เม็ด"] },
+      { rank: 4, name: "ยี่ห้อ C Effervescent", price: "฿420", rating: 4.1, bestFor: "เม็ดฟู่ ดื่มง่าย", pros: ["ละลายน้ำ ดื่มง่าย", "ราคาประหยัด"], cons: ["มีโซเดียม/น้ำตาลแฝง", "ต้องชงทุกครั้ง"] },
+      { rank: 5, name: "ยี่ห้อ D Ascorbic Acid", price: "฿350", rating: 3.8, bestFor: "ราคาถูกที่สุด", pros: ["ราคาต่ำสุด", "หาซื้อง่าย"], cons: ["กรดแอสคอร์บิกอาจกัดกระเพาะ", "ไม่มีระบบปลดปล่อยช้า"] },
     ],
     comparisonNote: "คะแนนรวมพิจารณาจาก: รูปแบบวิตามินซี (30%) · ปริมาณ/การดูดซึม (30%) · ความปลอดภัยต่อกระเพาะ (20%) · ความคุ้มค่า (20%)",
     sections: [
-      {
-        heading: "วิตามินซีแบบไหนดูดซึมดีที่สุด?",
-        body: [
-          "รูปแบบของวิตามินซีมีผลต่อการดูดซึมและความระคายเคืองต่อกระเพาะมาก โดยทั่วไป Liposomal C ดูดซึมได้สูงที่สุด รองลงมาคือ Sodium Ascorbate (ชนิดบัฟเฟอร์ที่ไม่เป็นกรด) ส่วน Ascorbic Acid ทั่วไปดูดซึมได้ดีแต่เป็นกรดจึงอาจกัดกระเพาะหากกินตอนท้องว่าง",
-          "สำหรับคนทั่วไปที่กินทุกวัน แนะนำชนิด Sodium Ascorbate แบบปลดปล่อยช้า เพราะสมดุลระหว่างการดูดซึม ความปลอดภัย และราคาดีที่สุด",
-        ],
-      },
-      {
-        heading: "ควรกินวิตามินซีวันละเท่าไร?",
-        body: [
-          "ปริมาณที่แนะนำสำหรับผู้ใหญ่ทั่วไปอยู่ที่ 1,000 มก. ต่อวัน ซึ่งเพียงพอต่อการเสริมภูมิคุ้มกันและต้านอนุมูลอิสระ ร่างกายดูดซึมวิตามินซีได้จำกัดต่อครั้ง ส่วนที่เกินจะถูกขับออกทางปัสสาวะ การกินโดสสูงมาก (เกิน 2,000 มก.) จึงไม่ได้ประโยชน์เพิ่มและอาจทำให้ท้องเสีย",
-        ],
-      },
-      {
-        heading: "ควรกินตอนไหน?",
-        body: [
-          "กินพร้อมหรือหลังอาหารเพื่อลดการระคายเคืองกระเพาะ และช่วยให้ดูดซึมสม่ำเสมอ หากกินชนิดปลดปล่อยช้าสามารถกินวันละครั้งได้",
-        ],
-      },
+      { heading: "วิตามินซีแบบไหนดูดซึมดีที่สุด?", body: ["รูปแบบของวิตามินซีมีผลต่อการดูดซึมและความระคายเคืองต่อกระเพาะมาก โดยทั่วไป Liposomal C ดูดซึมได้สูงที่สุด รองลงมาคือ Sodium Ascorbate (ชนิดบัฟเฟอร์ที่ไม่เป็นกรด) ส่วน Ascorbic Acid ทั่วไปดูดซึมได้ดีแต่เป็นกรดจึงอาจกัดกระเพาะหากกินตอนท้องว่าง", "สำหรับคนทั่วไปที่กินทุกวัน แนะนำชนิด Sodium Ascorbate แบบปลดปล่อยช้า เพราะสมดุลระหว่างการดูดซึม ความปลอดภัย และราคาดีที่สุด"] },
+      { heading: "ควรกินวิตามินซีวันละเท่าไร?", body: ["ปริมาณที่แนะนำสำหรับผู้ใหญ่ทั่วไปอยู่ที่ 1,000 มก. ต่อวัน ซึ่งเพียงพอต่อการเสริมภูมิคุ้มกันและต้านอนุมูลอิสระ ร่างกายดูดซึมวิตามินซีได้จำกัดต่อครั้ง ส่วนที่เกินจะถูกขับออกทางปัสสาวะ การกินโดสสูงมาก (เกิน 2,000 มก.) จึงไม่ได้ประโยชน์เพิ่มและอาจทำให้ท้องเสีย"] },
+      { heading: "ควรกินตอนไหน?", body: ["กินพร้อมหรือหลังอาหารเพื่อลดการระคายเคืองกระเพาะ และช่วยให้ดูดซึมสม่ำเสมอ หากกินชนิดปลดปล่อยช้าสามารถกินวันละครั้งได้"] },
     ],
     faq: [
       { q: "วิตามินซีกินตอนท้องว่างได้ไหม?", a: "ชนิด Sodium Ascorbate (บัฟเฟอร์) กินตอนท้องว่างได้ปลอดภัยกว่า แต่ชนิด Ascorbic Acid ควรกินหลังอาหารเพื่อเลี่ยงการกัดกระเพาะ" },
@@ -130,46 +166,15 @@ export const REVIEWS: Review[] = [
     datePublished: "2026-02-10",
     dateUpdated: "2026-06-18",
     products: [
-      {
-        rank: 1, name: "Doctermatee Marine Collagen Peptide", price: "฿790", rating: 4.8,
-        bestFor: "ดูดซึมดีที่สุด · ไม่มีกลิ่นคาว", highlight: true,
-        productHref: "/products?q=คอลลาเจน",
-        pros: ["คอลลาเจนปลาทะเล Tripeptide โมเลกุลเล็ก", "ผสมวิตามินซีช่วยสังเคราะห์คอลลาเจน", "ละลายน้ำง่าย ไม่มีกลิ่นคาว", "มีเลข อย."],
-        cons: ["ไม่เหมาะกับคนแพ้อาหารทะเล"],
-      },
-      {
-        rank: 2, name: "ยี่ห้อ A Collagen Tripeptide", price: "฿990", rating: 4.5,
-        bestFor: "เปปไทด์เกรดพรีเมียม",
-        pros: ["Tripeptide ดูดซึมสูง", "มีงานวิจัยรองรับ"],
-        cons: ["ราคาสูง", "ปริมาณต่อซองน้อย"],
-      },
-      {
-        rank: 3, name: "ยี่ห้อ B Collagen + Biotin", price: "฿690", rating: 4.3,
-        bestFor: "บำรุงผม-เล็บเพิ่ม",
-        pros: ["มี Biotin บำรุงผมและเล็บ", "รสชาติดี"],
-        cons: ["คอลลาเจนจากหนังหมู (ไม่เหมาะมุสลิม)", "โมเลกุลใหญ่กว่า"],
-      },
-      {
-        rank: 4, name: "ยี่ห้อ C Collagen Powder", price: "฿450", rating: 3.9,
-        bestFor: "ราคาประหยัด",
-        pros: ["ราคาถูก", "ปริมาณเยอะ"],
-        cons: ["มีกลิ่นคาวเล็กน้อย", "ละลายยาก"],
-      },
+      { rank: 1, name: "Doctermatee Marine Collagen Peptide", price: "฿790", rating: 4.8, bestFor: "ดูดซึมดีที่สุด · ไม่มีกลิ่นคาว", highlight: true, productHref: "/products?q=คอลลาเจน", pros: ["คอลลาเจนปลาทะเล Tripeptide โมเลกุลเล็ก", "ผสมวิตามินซีช่วยสังเคราะห์คอลลาเจน", "ละลายน้ำง่าย ไม่มีกลิ่นคาว", "มีเลข อย."], cons: ["ไม่เหมาะกับคนแพ้อาหารทะเล"] },
+      { rank: 2, name: "ยี่ห้อ A Collagen Tripeptide", price: "฿990", rating: 4.5, bestFor: "เปปไทด์เกรดพรีเมียม", pros: ["Tripeptide ดูดซึมสูง", "มีงานวิจัยรองรับ"], cons: ["ราคาสูง", "ปริมาณต่อซองน้อย"] },
+      { rank: 3, name: "ยี่ห้อ B Collagen + Biotin", price: "฿690", rating: 4.3, bestFor: "บำรุงผม-เล็บเพิ่ม", pros: ["มี Biotin บำรุงผมและเล็บ", "รสชาติดี"], cons: ["คอลลาเจนจากหนังหมู (ไม่เหมาะมุสลิม)", "โมเลกุลใหญ่กว่า"] },
+      { rank: 4, name: "ยี่ห้อ C Collagen Powder", price: "฿450", rating: 3.9, bestFor: "ราคาประหยัด", pros: ["ราคาถูก", "ปริมาณเยอะ"], cons: ["มีกลิ่นคาวเล็กน้อย", "ละลายยาก"] },
     ],
     comparisonNote: "คะแนนรวมพิจารณาจาก: ชนิด/ขนาดโมเลกุล (35%) · แหล่งที่มา (20%) · ส่วนผสมเสริม (20%) · ความคุ้มค่า (25%)",
     sections: [
-      {
-        heading: "คอลลาเจนปลากับคอลลาเจนหมู ต่างกันอย่างไร?",
-        body: [
-          "คอลลาเจนจากปลาทะเล (Marine) มีน้ำหนักโมเลกุลต่ำกว่า ดูดซึมเข้าสู่ผิวได้ดีกว่า และเหมาะกับคนที่ทานฮาลาล ส่วนคอลลาเจนจากหนังหมูหรือวัวมีราคาถูกกว่าแต่โมเลกุลใหญ่กว่า การดูดซึมจึงด้อยกว่าเล็กน้อย",
-        ],
-      },
-      {
-        heading: "ควรกินคอลลาเจนวันละเท่าไร?",
-        body: [
-          "งานวิจัยส่วนใหญ่ใช้ปริมาณ 5,000–10,000 มก. ต่อวัน ติดต่อกันอย่างน้อย 8–12 สัปดาห์จึงเห็นผลกับความยืดหยุ่นและความชุ่มชื้นของผิว การกินร่วมกับวิตามินซีจะช่วยให้ร่างกายสังเคราะห์คอลลาเจนได้ดีขึ้น",
-        ],
-      },
+      { heading: "คอลลาเจนปลากับคอลลาเจนหมู ต่างกันอย่างไร?", body: ["คอลลาเจนจากปลาทะเล (Marine) มีน้ำหนักโมเลกุลต่ำกว่า ดูดซึมเข้าสู่ผิวได้ดีกว่า และเหมาะกับคนที่ทานฮาลาล ส่วนคอลลาเจนจากหนังหมูหรือวัวมีราคาถูกกว่าแต่โมเลกุลใหญ่กว่า การดูดซึมจึงด้อยกว่าเล็กน้อย"] },
+      { heading: "ควรกินคอลลาเจนวันละเท่าไร?", body: ["งานวิจัยส่วนใหญ่ใช้ปริมาณ 5,000–10,000 มก. ต่อวัน ติดต่อกันอย่างน้อย 8–12 สัปดาห์จึงเห็นผลกับความยืดหยุ่นและความชุ่มชื้นของผิว การกินร่วมกับวิตามินซีจะช่วยให้ร่างกายสังเคราะห์คอลลาเจนได้ดีขึ้น"] },
     ],
     faq: [
       { q: "คอลลาเจนกินตอนไหนดีที่สุด?", a: "กินก่อนนอนหรือตอนท้องว่างช่วงเช้า เพราะร่างกายซ่อมแซมเซลล์ผิวช่วงนอนหลับ และการดูดซึมดีขึ้นเมื่อไม่มีอาหารอื่นแข่ง" },
@@ -192,46 +197,15 @@ export const REVIEWS: Review[] = [
     datePublished: "2026-03-05",
     dateUpdated: "2026-06-15",
     products: [
-      {
-        rank: 1, name: "Doctermatee Omega-3 Fish Oil", price: "฿690", rating: 4.7,
-        bestFor: "EPA+DHA สูงสุดต่อเม็ด · ไม่เรอคาว", highlight: true,
-        productHref: "/products?q=น้ำมันปลา",
-        pros: ["EPA+DHA รวม 600 มก./เม็ด", "กลั่นระดับเภสัชกรรม (Molecular Distillation)", "เคลือบ enteric ไม่เรอกลิ่นคาว", "มีเลข อย."],
-        cons: ["เม็ดขนาดกลาง-ใหญ่"],
-      },
-      {
-        rank: 2, name: "ยี่ห้อ A Triple Strength", price: "฿1,150", rating: 4.5,
-        bestFor: "โดส EPA+DHA สูงมาก",
-        pros: ["EPA+DHA สูงมากต่อเม็ด", "เหมาะกับคนต้องการโดสสูง"],
-        cons: ["ราคาสูง", "เม็ดใหญ่กลืนยาก"],
-      },
-      {
-        rank: 3, name: "ยี่ห้อ B Salmon Oil", price: "฿590", rating: 4.0,
-        bestFor: "น้ำมันปลาแซลมอน",
-        pros: ["จากปลาแซลมอน", "ราคากลาง ๆ"],
-        cons: ["EPA+DHA ต่อเม็ดต่ำ", "ต้องกินหลายเม็ด"],
-      },
-      {
-        rank: 4, name: "ยี่ห้อ C Fish Oil 1000", price: "฿390", rating: 3.7,
-        bestFor: "ราคาถูก",
-        pros: ["ราคาประหยัด", "หาซื้อง่าย"],
-        cons: ["โฆษณา 1000 มก. แต่ EPA+DHA จริงต่ำ", "เรอกลิ่นคาว"],
-      },
+      { rank: 1, name: "Doctermatee Omega-3 Fish Oil", price: "฿690", rating: 4.7, bestFor: "EPA+DHA สูงสุดต่อเม็ด · ไม่เรอคาว", highlight: true, productHref: "/products?q=น้ำมันปลา", pros: ["EPA+DHA รวม 600 มก./เม็ด", "กลั่นระดับเภสัชกรรม (Molecular Distillation)", "เคลือบ enteric ไม่เรอกลิ่นคาว", "มีเลข อย."], cons: ["เม็ดขนาดกลาง-ใหญ่"] },
+      { rank: 2, name: "ยี่ห้อ A Triple Strength", price: "฿1,150", rating: 4.5, bestFor: "โดส EPA+DHA สูงมาก", pros: ["EPA+DHA สูงมากต่อเม็ด", "เหมาะกับคนต้องการโดสสูง"], cons: ["ราคาสูง", "เม็ดใหญ่กลืนยาก"] },
+      { rank: 3, name: "ยี่ห้อ B Salmon Oil", price: "฿590", rating: 4.0, bestFor: "น้ำมันปลาแซลมอน", pros: ["จากปลาแซลมอน", "ราคากลาง ๆ"], cons: ["EPA+DHA ต่อเม็ดต่ำ", "ต้องกินหลายเม็ด"] },
+      { rank: 4, name: "ยี่ห้อ C Fish Oil 1000", price: "฿390", rating: 3.7, bestFor: "ราคาถูก", pros: ["ราคาประหยัด", "หาซื้อง่าย"], cons: ["โฆษณา 1000 มก. แต่ EPA+DHA จริงต่ำ", "เรอกลิ่นคาว"] },
     ],
     comparisonNote: "คะแนนรวมพิจารณาจาก: ปริมาณ EPA+DHA จริง (40%) · ความบริสุทธิ์/การกลั่น (25%) · การกลืน/กลิ่นคาว (15%) · ความคุ้มค่า (20%)",
     sections: [
-      {
-        heading: "ดูปริมาณ EPA+DHA อย่างไรไม่ให้โดนหลอก?",
-        body: [
-          "หลายยี่ห้อโฆษณา ‘น้ำมันปลา 1,000 มก.’ แต่นั่นคือขนาดน้ำมันปลารวม ไม่ใช่สารออกฤทธิ์ ให้พลิกดูฉลากหลังที่ระบุ EPA และ DHA เป็นมิลลิกรัม แล้วบวกกัน ผลิตภัณฑ์ที่ดีควรให้ EPA+DHA รวมอย่างน้อย 500 มก. ต่อเม็ด",
-        ],
-      },
-      {
-        heading: "ใครควรกินน้ำมันปลา?",
-        body: [
-          "เหมาะกับคนที่กินปลาทะเลน้อย ผู้ที่ต้องการบำรุงสมองและความจำ คนที่มีไขมันในเลือดสูง และผู้สูงอายุ ผู้ที่ทานยาละลายลิ่มเลือดควรปรึกษาแพทย์ก่อน",
-        ],
-      },
+      { heading: "ดูปริมาณ EPA+DHA อย่างไรไม่ให้โดนหลอก?", body: ["หลายยี่ห้อโฆษณา ‘น้ำมันปลา 1,000 มก.’ แต่นั่นคือขนาดน้ำมันปลารวม ไม่ใช่สารออกฤทธิ์ ให้พลิกดูฉลากหลังที่ระบุ EPA และ DHA เป็นมิลลิกรัม แล้วบวกกัน ผลิตภัณฑ์ที่ดีควรให้ EPA+DHA รวมอย่างน้อย 500 มก. ต่อเม็ด"] },
+      { heading: "ใครควรกินน้ำมันปลา?", body: ["เหมาะกับคนที่กินปลาทะเลน้อย ผู้ที่ต้องการบำรุงสมองและความจำ คนที่มีไขมันในเลือดสูง และผู้สูงอายุ ผู้ที่ทานยาละลายลิ่มเลือดควรปรึกษาแพทย์ก่อน"] },
     ],
     faq: [
       { q: "น้ำมันปลากับน้ำมันตับปลาต่างกันไหม?", a: "ต่างกันมาก น้ำมันปลา (Fish Oil) ให้ Omega-3 (EPA/DHA) ส่วนน้ำมันตับปลา (Cod Liver Oil) เน้นวิตามิน A และ D อย่าสับสนกัน" },
@@ -242,16 +216,3 @@ export const REVIEWS: Review[] = [
       "Doctermatee Omega-3 Fish Oil ให้ความคุ้มค่าดีที่สุด — EPA+DHA สูงต่อเม็ด ผ่านการกลั่นบริสุทธิ์ และไม่เรอกลิ่นคาว เหมาะกับการกินประจำทุกวัน",
   },
 ];
-
-export function getAllReviews(): Review[] {
-  // เรียงตามวันที่อัปเดตล่าสุด
-  return [...REVIEWS].sort((a, b) => (a.dateUpdated < b.dateUpdated ? 1 : -1));
-}
-
-export function getReview(slug: string): Review | undefined {
-  return REVIEWS.find((r) => r.slug === slug);
-}
-
-export function getFeaturedReviews(n = 3): Review[] {
-  return getAllReviews().slice(0, n);
-}

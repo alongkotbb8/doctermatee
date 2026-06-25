@@ -54,7 +54,7 @@ export default async function HomePage() {
   const promo = config.promo ?? {};
 
   const gridProducts = rawProducts.slice(0, 4);
-  const featuredReviews = getFeaturedReviews(3);
+  const featuredReviews = await getFeaturedReviews(3);
 
   return (
     <>

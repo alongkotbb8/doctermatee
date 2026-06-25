@@ -2,17 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IconBarChart, IconPackage, IconTag, IconTruck, IconSettings, IconUser, IconEdit, IconArrowRight, IconImage } from "@/components/icons";
+import { IconBarChart, IconPackage, IconTag, IconTruck, IconSettings, IconUser, IconEdit, IconArrowRight, IconImage, IconStar } from "@/components/icons";
 
 const NAV = [
-  { href: "/admin",           label: "แดชบอร์ด",   icon: <IconBarChart size={17} color="currentColor" /> },
-  { href: "/admin/orders",    label: "ออเดอร์",      icon: <IconTruck size={17} color="currentColor" /> },
-  { href: "/admin/products",  label: "สินค้า",       icon: <IconPackage size={17} color="currentColor" /> },
-  { href: "/admin/coupons",   label: "คูปอง",        icon: <IconTag size={17} color="currentColor" /> },
-  { href: "/admin/articles",  label: "บทความ",       icon: <IconEdit size={17} color="currentColor" /> },
-  { href: "/admin/banner",    label: "แบนเนอร์หลัก", icon: <IconImage size={17} color="currentColor" /> },
-  { href: "/admin/reports",   label: "รายงาน",       icon: <IconBarChart size={17} color="currentColor" /> },
-  { href: "/admin/settings",  label: "ตั้งค่าเว็บ",  icon: <IconSettings size={17} color="currentColor" /> },
+  { href: "/admin",                label: "แดชบอร์ด",     icon: <IconBarChart size={17} color="currentColor" /> },
+  { href: "/admin/orders",         label: "ออเดอร์",       icon: <IconTruck size={17} color="currentColor" /> },
+  { href: "/admin/products",       label: "สินค้า",        icon: <IconPackage size={17} color="currentColor" /> },
+  { href: "/admin/coupons",        label: "คูปอง",         icon: <IconTag size={17} color="currentColor" /> },
+  { href: "/admin/articles",       label: "บทความ",        icon: <IconEdit size={17} color="currentColor" /> },
+  { href: "/admin/reviews",        label: "รีวิว",         icon: <IconStar size={17} color="currentColor" /> },
+  { href: "/admin/product-reviews", label: "รีวิวลูกค้า",   icon: <IconUser size={17} color="currentColor" /> },
+  { href: "/admin/banner",         label: "แบนเนอร์หลัก",  icon: <IconImage size={17} color="currentColor" /> },
+  { href: "/admin/reports",        label: "รายงาน",        icon: <IconBarChart size={17} color="currentColor" /> },
+  { href: "/admin/settings",       label: "ตั้งค่าเว็บ",   icon: <IconSettings size={17} color="currentColor" /> },
 ];
 
 export default function AdminSidebar() {

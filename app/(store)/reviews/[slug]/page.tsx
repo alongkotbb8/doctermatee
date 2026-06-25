@@ -7,13 +7,16 @@ import { IconArrowRight, IconCheck, IconX, IconShield, IconClock, IconUser } fro
 
 interface Props { params: Promise<{ slug: string }> }
 
-export function generateStaticParams() {
-  return getAllReviews().map((r) => ({ slug: r.slug }));
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const all = await getAllReviews();
+  return all.map((r) => ({ slug: r.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const r = getReview(slug);
+  const r = await getReview(slug);
   if (!r) return { title: "ไม่พบรีวิว" };
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://doctermatee.co.th";
   return {
@@ -26,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ReviewDetailPage({ params }: Props) {
   const { slug } = await params;
-  const r = getReview(slug);
+  const r = await getReview(slug);
   if (!r) notFound();
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://doctermatee.co.th";

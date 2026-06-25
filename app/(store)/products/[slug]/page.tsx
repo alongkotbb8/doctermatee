@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getActiveProducts } from "@/lib/data";
 import AddToCartButton from "@/components/AddToCartButton";
-import ProductReviews, { getProductRating } from "@/components/ProductReviews";
+import ProductReviews from "@/components/ProductReviews";
+import { getProductRating } from "@/lib/productReviews";
 import { IconPill, IconFlask, IconSparkles, IconBaby, IconHeartPulse, IconLeaf, IconTruck } from "@/components/icons";
 import type { Metadata } from "next";
 
@@ -44,9 +45,9 @@ export default async function ProductDetailPage({ params }: Props) {
   const icon = CAT_ICONS[catSlug] ?? <IconLeaf size={96} color="var(--teal-400)" />;
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://doctermatee.co.th";
-  const { avg, total } = getProductRating(product.id);
+  const { avg, total } = await getProductRating(product.id);
 
-  // Product + AggregateRating + Review (Schema.org) — ให้ AI/Google เข้าใจสินค้าและคะแนน
+  // Product (Schema.org) — ให้ AI/Google เข้าใจสินค้า; ใส่ aggregateRating เฉพาะเมื่อมีรีวิวจริง
   const productLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -62,13 +63,17 @@ export default async function ProductDetailPage({ params }: Props) {
       price: product.price,
       availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
     },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: avg.toFixed(1),
-      reviewCount: total,
-      bestRating: 5,
-      worstRating: 1,
-    },
+    ...(total > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: avg.toFixed(1),
+            reviewCount: total,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        }
+      : {}),
   };
 
   return (
