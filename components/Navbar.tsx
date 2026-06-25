@@ -53,50 +53,48 @@ export default function Navbar() {
     >
       <div className="wrap nav-bar" style={{ display: "flex", alignItems: "center", gap: 16, height: 68 }}>
 
-        {/* Hamburger (มือถือ) */}
-        <button className="nav-hamburger" onClick={() => setOpen((o) => !o)} aria-label="เมนู"
-          style={{ display: "none", width: 40, height: 40, border: "none", background: "var(--neutral-50)", borderRadius: 10, cursor: "pointer", alignItems: "center", justifyContent: "center", color: "var(--neutral-700)", flexShrink: 0 }}>
-          {open ? <IconX size={20} color="currentColor" /> : <IconMenu size={20} color="currentColor" />}
-        </button>
-
-        {/* Logo (เฉพาะโลโก้ ไม่มีตัวอักษร) */}
-        <Logo size={40} iconOnly />
-
-        {/* Nav links (เดสก์ท็อป) */}
-        <nav className="nav-links" style={{ display: "flex", alignItems: "center", gap: 2 }}>
-          {LINKS.map((l) => (
-            <Link key={l.href} href={l.href} className="nav-link" style={{
-              fontFamily: "var(--font-display)", fontWeight: 500, fontSize: 15,
-              color: path === l.href ? "var(--teal-700)" : "var(--neutral-700)",
-              padding: "8px 14px", borderRadius: "var(--radius-full)",
-              background: path === l.href ? "var(--green-50)" : "transparent",
-              textDecoration: "none", whiteSpace: "nowrap",
-            }}>
-              {l.label}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Search */}
-        <form className="nav-search" onSubmit={submitSearch} style={{ flex: 1, display: "flex", alignItems: "center", background: "var(--neutral-50)", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-full)", padding: "0 6px 0 16px", height: 42, minWidth: 0, maxWidth: 340, marginLeft: "auto" }}>
-          <input type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาสินค้า…" style={{ flex: 1, minWidth: 0, border: "none", background: "none", outline: "none", fontFamily: "var(--font-body)", fontSize: 14, color: "var(--neutral-900)" }} />
-          <button type="submit" aria-label="ค้นหา" style={{ width: 32, height: 32, border: "none", borderRadius: "50%", background: "var(--color-primary)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <IconSearch size={15} color="#fff" />
+        {/* ซ้าย: hamburger + logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+          <button className="nav-hamburger" onClick={() => setOpen((o) => !o)} aria-label="เมนู"
+            style={{ display: "none", width: 40, height: 40, border: "none", background: "var(--neutral-50)", borderRadius: 10, cursor: "pointer", alignItems: "center", justifyContent: "center", color: "var(--neutral-700)", flexShrink: 0 }}>
+            {open ? <IconX size={20} color="currentColor" /> : <IconMenu size={20} color="currentColor" />}
           </button>
-        </form>
+          <Logo size={40} iconOnly />
+        </div>
 
-        {/* Account + Cart */}
+        {/* กลาง: เมนู + ช่องค้นหา */}
+        <div className="nav-center" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 18, minWidth: 0 }}>
+          <nav className="nav-links" style={{ display: "flex", alignItems: "center", gap: 2 }}>
+            {LINKS.map((l) => (
+              <Link key={l.href} href={l.href} className="nav-link" style={{
+                fontFamily: "var(--font-display)", fontWeight: 500, fontSize: 15,
+                color: path === l.href ? "var(--teal-700)" : "var(--neutral-700)",
+                padding: "8px 14px", borderRadius: "var(--radius-full)",
+                background: path === l.href ? "var(--green-50)" : "transparent",
+                textDecoration: "none", whiteSpace: "nowrap",
+              }}>
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+          <form className="nav-search" onSubmit={submitSearch} style={{ display: "flex", alignItems: "center", background: "var(--neutral-50)", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-full)", padding: "0 6px 0 16px", height: 42, width: 320, maxWidth: "36%", minWidth: 0 }}>
+            <input type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาสินค้า…" style={{ flex: 1, minWidth: 0, border: "none", background: "none", outline: "none", fontFamily: "var(--font-body)", fontSize: 14, color: "var(--neutral-900)" }} />
+            <button type="submit" aria-label="ค้นหา" style={{ width: 32, height: 32, border: "none", borderRadius: "50%", background: "var(--color-primary)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <IconSearch size={15} color="#fff" />
+            </button>
+          </form>
+        </div>
+
+        {/* ขวา: บัญชี + ตะกร้า + ปรึกษาแพทย์ */}
         <div style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
           <Link href="/account" className="icon-btn" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, color: "var(--neutral-700)", fontSize: 10, textDecoration: "none" }}>
             <IconUser size={22} color="var(--neutral-700)" />บัญชี
           </Link>
           <CartIcon />
+          <Link href="/contact" className="nav-consult" style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--green-50)", border: "1px solid var(--teal-100)", borderRadius: "var(--radius-full)", padding: "8px 16px", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "var(--teal-700)", textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0 }}>
+            <IconStethoscope size={18} color="var(--teal-700)" /> ปรึกษาแพทย์
+          </Link>
         </div>
-
-        {/* Consult — ขวาสุด (เดสก์ท็อป) */}
-        <Link href="/contact" className="nav-consult" style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--green-50)", border: "1px solid var(--teal-100)", borderRadius: "var(--radius-full)", padding: "8px 16px", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "var(--teal-700)", textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0 }}>
-          <IconStethoscope size={18} color="var(--teal-700)" /> ปรึกษาแพทย์
-        </Link>
       </div>
 
       {/* Mobile drawer */}

@@ -26,7 +26,7 @@ export default function AdminSidebar() {
         <Link href="/admin" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 34, height: 34, borderRadius: 10, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.svg" alt="Doctermatee" style={{ height: 22, width: "auto", display: "block" }} />
+            <img src="/icon.svg" alt="Doctermatee" style={{ height: 22, width: "auto", display: "block" }} />
           </div>
           <div>
             <p style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 15, color: "#fff" }}>Doctermatee</p>
