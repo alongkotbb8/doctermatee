@@ -38,7 +38,7 @@ export default function SettingsForm({ contact, shipping }: Props) {
     router.refresh();
   }
 
-  const inp = { width: "100%", height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", padding: "0 14px", fontSize: 14, fontFamily: "var(--font-body)", outline: "none", background: "#fff" } as React.CSSProperties;
+  const inp = { width: "100%", height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", padding: "0 16px", fontSize: 14, fontFamily: "var(--font-body)", outline: "none", background: "#fff" } as React.CSSProperties;
   const lbl: React.CSSProperties = { display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 6 };
   const card: React.CSSProperties = { padding: "22px 24px", display: "flex", flexDirection: "column", gap: 14 };
   const head = (icon: React.ReactNode, t: string) => (

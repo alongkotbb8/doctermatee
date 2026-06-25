@@ -142,7 +142,7 @@ export default function PaymentClient({ orderId, orderNo, total, omisePublicKey 
   const inputStyle = {
     width: "100%", height: 44,
     border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)",
-    padding: "0 14px", fontSize: 14, fontFamily: "var(--font-body)", outline: "none",
+    padding: "0 16px", fontSize: 14, fontFamily: "var(--font-body)", outline: "none",
   };
 
   return (

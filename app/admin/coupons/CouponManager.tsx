@@ -65,7 +65,7 @@ export default function CouponManager({ initial }: { initial: Coupon[] }) {
     setCoupons((list) => list.filter((x) => x.code !== codeToDel));
   }
 
-  const inp = { width: "100%", height: 42, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", padding: "0 14px", fontSize: 14, fontFamily: "var(--font-body)", outline: "none", background: "#fff" } as React.CSSProperties;
+  const inp = { width: "100%", height: 42, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", padding: "0 16px", fontSize: 14, fontFamily: "var(--font-body)", outline: "none", background: "#fff" } as React.CSSProperties;
   const lbl: React.CSSProperties = { display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 6 };
 
   return (

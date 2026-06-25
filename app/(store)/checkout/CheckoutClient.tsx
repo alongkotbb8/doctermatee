@@ -222,7 +222,7 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
               </h2>
               <div style={{ display: "flex", gap: 8 }}>
                 <input value={couponCode} onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponStatus("idle"); }}
-                  style={{ flex: 1, height: 42, border: `1px solid ${couponStatus === "valid" ? "var(--teal-500)" : couponStatus === "invalid" ? "#EF4444" : "var(--neutral-200)"}`, borderRadius: "var(--radius-input)", padding: "0 14px", fontSize: 14, fontFamily: "var(--font-body)", letterSpacing: "0.08em", outline: "none" }}
+                  style={{ flex: 1, height: 42, border: `1px solid ${couponStatus === "valid" ? "var(--teal-500)" : couponStatus === "invalid" ? "#EF4444" : "var(--neutral-200)"}`, borderRadius: "var(--radius-input)", padding: "0 16px", fontSize: 14, fontFamily: "var(--font-body)", letterSpacing: "0.08em", outline: "none" }}
                   placeholder="เช่น WELCOME10"
                   onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { if (couponStatus === "idle") e.target.style.borderColor = "var(--neutral-200)"; }}
                 />
