@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { IconSearch, IconUser, IconMenu, IconStethoscope, IconPlus, IconX } from "./icons";
+import { IconSearch, IconUser, IconMenu, IconStethoscope, IconX } from "./icons";
 import CartIcon from "./CartIcon";
+import Logo from "./Logo";
 
 const LINKS = [
   { href: "/", label: "หน้าแรก" },
@@ -59,12 +60,7 @@ export default function Navbar() {
         </button>
 
         {/* Logo */}
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 9, fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 21, color: "var(--neutral-900)", letterSpacing: "-0.02em", textDecoration: "none", flexShrink: 0 }}>
-          <span style={{ width: 36, height: 36, borderRadius: 10, background: "var(--color-primary)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <IconPlus size={20} color="#fff" />
-          </span>
-          Doctermatee
-        </Link>
+        <Logo size={34} />
 
         {/* Nav links (เดสก์ท็อป) */}
         <nav className="nav-links" style={{ display: "flex", alignItems: "center", gap: 2 }}>

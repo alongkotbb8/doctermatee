@@ -27,8 +27,10 @@ export const metadata: Metadata = {
     siteName: "Doctermatee",
     title: "Doctermatee — อาหารเสริมและวิตามินคุณภาพ",
     description: "ร้านอาหารเสริม วิตามิน และผลิตภัณฑ์ดูแลสุขภาพออนไลน์ คัดสรรโดยผู้เชี่ยวชาญ",
+    images: [{ url: "/OG.png", width: 1080, height: 1080, alt: "Doctermatee" }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: { card: "summary_large_image", images: ["/OG.png"] },
+  icons: { icon: "/logo.svg", apple: "/OG.png" },
   alternates: { canonical: siteUrl },
 };
 

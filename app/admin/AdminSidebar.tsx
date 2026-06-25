@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IconBarChart, IconPackage, IconTag, IconTruck, IconSettings, IconPlus, IconUser, IconEdit, IconArrowRight, IconImage } from "@/components/icons";
+import { IconBarChart, IconPackage, IconTag, IconTruck, IconSettings, IconUser, IconEdit, IconArrowRight, IconImage } from "@/components/icons";
 
 const NAV = [
   { href: "/admin",           label: "แดชบอร์ด",   icon: <IconBarChart size={17} color="currentColor" /> },
@@ -24,8 +24,9 @@ export default function AdminSidebar() {
       {/* Logo */}
       <div className="admin-logo" style={{ padding: "20px 18px 18px", borderBottom: "1px solid rgba(255,255,255,.08)", marginBottom: 8 }}>
         <Link href="/admin" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 34, height: 34, borderRadius: 10, background: "linear-gradient(135deg,var(--teal-500),var(--teal-700))", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(20,184,166,.4)" }}>
-            <IconPlus size={17} color="#fff" />
+          <div style={{ width: 34, height: 34, borderRadius: 10, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.svg" alt="Doctermatee" style={{ height: 22, width: "auto", display: "block" }} />
           </div>
           <div>
             <p style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 15, color: "#fff" }}>Doctermatee</p>
