@@ -21,12 +21,13 @@ interface Props {
   orderNo: string;
   total: number;
   omisePublicKey: string;
+  initialMethod?: PayMethod;
 }
 
-export default function PaymentClient({ orderId, orderNo, total, omisePublicKey }: Props) {
+export default function PaymentClient({ orderId, orderNo, total, omisePublicKey, initialMethod = "promptpay" }: Props) {
   const router = useRouter();
   const clearCart = useCart((s) => s.clearCart);
-  const [method, setMethod] = useState<PayMethod>("promptpay");
+  const [method, setMethod] = useState<PayMethod>(initialMethod);
   const [omiseReady, setOmiseReady] = useState(false);
 
   // Card fields
@@ -130,13 +131,14 @@ export default function PaymentClient({ orderId, orderNo, total, omisePublicKey 
     setLoading(false);
   }
 
-  const tabStyle = (active: boolean) => ({
+  const tabStyle = (active: boolean): React.CSSProperties => ({
     flex: 1, padding: "12px 0", border: "none",
     background: active ? "var(--teal-600)" : "var(--neutral-100)",
     color: active ? "#fff" : "var(--neutral-600)",
     fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14,
     cursor: "pointer", transition: "all .2s",
     borderRadius: "var(--radius-full)",
+    display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
   });
 
   const inputStyle = {

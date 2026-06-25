@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { useCart } from "@/store/cart";
 import { createClient } from "@/lib/supabase/client";
-import { IconTag, IconTruck, IconShield, IconPill } from "@/components/icons";
+import { IconTag, IconTruck, IconShield, IconPill, IconCreditCard, IconQr } from "@/components/icons";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -37,6 +37,7 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
   const [couponData, setCouponData] = useState<{ discount_type: string; discount_value: number; code: string } | null>(null);
   const [couponMsg, setCouponMsg] = useState("");
 
+  const [payMethod, setPayMethod] = useState<"promptpay" | "card">("promptpay");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, boolean>>({});
@@ -120,7 +121,7 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
 
     // ไม่ล้าง cart ที่นี่ — จะล้างหลังชำระเงินสำเร็จในหน้า /payment
     placedRef.current = true;
-    router.push(`/payment/${json.order_id}`);
+    router.push(`/payment/${json.order_id}?method=${payMethod}`);
   }
 
   if (items.length === 0) return null;
@@ -236,6 +237,34 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
                   {couponStatus === "valid" ? "✓ " : "✗ "}{couponMsg}
                 </p>
               )}
+            </div>
+
+            {/* Payment method selection */}
+            <div className="card" style={{ padding: "20px 22px" }}>
+              <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, color: "var(--neutral-800)", marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>
+                <IconCreditCard size={16} color="var(--teal-600)" /> วิธีชำระเงิน
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {([
+                  { value: "promptpay" as const, label: "PromptPay QR Code", sub: "สแกนจ่ายได้ทุกธนาคาร รวดเร็ว ปลอดภัย", Icon: IconQr },
+                  { value: "card" as const, label: "บัตรเครดิต / เดบิต", sub: "Visa, Mastercard, JCB — ชำระทันที", Icon: IconCreditCard },
+                ] as const).map((opt) => {
+                  const active = payMethod === opt.value;
+                  return (
+                    <button key={opt.value} type="button" onClick={() => setPayMethod(opt.value)}
+                      style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", border: `2px solid ${active ? "var(--teal-500)" : "var(--neutral-200)"}`, borderRadius: "var(--radius-md)", background: active ? "var(--teal-50)" : "#fff", cursor: "pointer", textAlign: "left", transition: "all .15s", width: "100%" }}>
+                      <opt.Icon size={22} color={active ? "var(--teal-600)" : "var(--neutral-400)"} />
+                      <div style={{ flex: 1 }}>
+                        <p style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14, color: active ? "var(--teal-700)" : "var(--neutral-800)", margin: 0 }}>{opt.label}</p>
+                        <p style={{ fontSize: 12, color: "var(--neutral-500)", margin: "2px 0 0" }}>{opt.sub}</p>
+                      </div>
+                      <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${active ? "var(--teal-500)" : "var(--neutral-300)"}`, background: active ? "var(--teal-500)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        {active && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#fff" }} />}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Guest notice */}
