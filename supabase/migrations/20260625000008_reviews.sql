@@ -28,8 +28,10 @@ create table if not exists public.reviews (
 
 alter table public.reviews enable row level security;
 
+drop policy if exists "Anyone can view published reviews" on public.reviews;
 create policy "Anyone can view published reviews"
   on public.reviews for select using (is_published = true or public.is_admin());
+drop policy if exists "Admin can manage reviews" on public.reviews;
 create policy "Admin can manage reviews"
   on public.reviews for all using (public.is_admin());
 
@@ -47,19 +49,25 @@ create table if not exists public.product_reviews (
   created_at  timestamptz not null default now()
 );
 
+-- เผื่อกรณีเคยรัน migration เวอร์ชันก่อนหน้า (ตารางมีอยู่แล้วแต่ยังไม่มีคอลัมน์นี้)
+alter table public.product_reviews add column if not exists verified_purchase boolean not null default false;
+
 create index if not exists idx_product_reviews_product on public.product_reviews(product_id, status);
 
 alter table public.product_reviews enable row level security;
 
 -- เห็นเฉพาะรีวิวที่อนุมัติแล้ว (admin เห็นหมด)
+drop policy if exists "Anyone can view approved product reviews" on public.product_reviews;
 create policy "Anyone can view approved product reviews"
   on public.product_reviews for select using (status = 'approved' or public.is_admin());
 -- ผู้ใช้ที่ล็อกอินส่งรีวิวของตัวเองได้ — บังคับให้เริ่มที่ pending และห้ามตั้ง verified เอง
 -- (กันการ insert ตรงผ่าน supabase-js เพื่อ self-approve / ปลอม verified buyer)
+drop policy if exists "Logged-in users can submit product reviews" on public.product_reviews;
 create policy "Logged-in users can submit product reviews"
   on public.product_reviews for insert
   with check (auth.uid() = user_id and status = 'pending' and verified_purchase = false);
 -- admin จัดการ/อนุมัติ/ลบได้ทั้งหมด
+drop policy if exists "Admin can manage product reviews" on public.product_reviews;
 create policy "Admin can manage product reviews"
   on public.product_reviews for all using (public.is_admin());
 
