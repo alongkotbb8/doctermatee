@@ -18,7 +18,7 @@ export default function Logo({ size = 34, dark = false, href = "/", iconOnly = f
         }
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.svg" alt="Doctermatee" style={{ height: size, width: "auto", display: "block" }} />
+        <img src="/logo.svg?v=2" alt="Doctermatee" style={{ height: size, width: "auto", display: "block" }} />
       </span>
       {!iconOnly && (
         <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: Math.round(size * 0.62), letterSpacing: "-0.02em", color: dark ? "#fff" : "var(--neutral-900)" }}>
