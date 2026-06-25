@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getActiveProducts } from "@/lib/data";
 import AddToCartButton from "@/components/AddToCartButton";
+import BuyNowButton from "@/components/BuyNowButton";
 import ProductReviews from "@/components/ProductReviews";
 import { getProductRating } from "@/lib/productReviews";
 import { jsonLd } from "@/lib/jsonld";
@@ -169,9 +170,15 @@ export default async function ProductDetailPage({ params }: Props) {
                 size="lg"
               />
               {product.stock > 0 && (
-                <Link href="/checkout" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "transparent", color: "var(--teal-700)", border: "1.5px solid var(--teal-600)", borderRadius: "var(--radius-full)", padding: "13px 0", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, textDecoration: "none" }}>
-                  ซื้อเลย
-                </Link>
+                <BuyNowButton
+                  productId={product.id}
+                  productName={product.name}
+                  price={product.price}
+                  compareAtPrice={product.compare_at_price}
+                  image={product.images[0] ?? null}
+                  categoryName={(product.categories as { name: string } | null)?.name ?? null}
+                  stock={product.stock}
+                />
               )}
             </div>
 
