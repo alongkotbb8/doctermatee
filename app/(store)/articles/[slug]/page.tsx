@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { IconClock, IconArrowRight } from "@/components/icons";
+import { jsonLd } from "@/lib/jsonld";
 
 export const revalidate = 60;
 
@@ -44,7 +45,7 @@ export default async function ArticlePage({ params }: Props) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
 
   // Schema.org Article JSON-LD
-  const jsonLd = {
+  const articleLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: article.title,
@@ -62,9 +63,20 @@ export default async function ArticlePage({ params }: Props) {
     mainEntityOfPage: { "@type": "WebPage", "@id": `${siteUrl}/articles/${slug}` },
   };
 
+  // FAQPage JSON-LD (ถ้าบทความมี FAQ)
+  const faqItems = (Array.isArray(article.faq) ? article.faq : []) as { q: string; a: string }[];
+  const faqLd = faqItems.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqItems.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+      }
+    : null;
+  const ld = faqLd ? [articleLd, faqLd] : articleLd;
+
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(ld) }} />
 
       <div style={{ padding: "48px 0 80px" }}>
         <div style={{ maxWidth: 760, margin: "0 auto", padding: "0 24px" }}>
@@ -102,6 +114,23 @@ export default async function ArticlePage({ params }: Props) {
 
           {/* Content */}
           <div className="article-body" dangerouslySetInnerHTML={{ __html: article.content ?? "" }} />
+
+          {/* FAQ (FAQPage) */}
+          {faqItems.length > 0 && (
+            <div style={{ marginTop: 48 }}>
+              <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 22, color: "var(--neutral-900)", marginBottom: 16 }}>คำถามที่พบบ่อย</h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {faqItems.map((f, i) => (
+                  <details key={i} className="card" style={{ padding: 0, overflow: "hidden" }}>
+                    <summary style={{ listStyle: "none", cursor: "pointer", padding: "16px 20px", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "var(--neutral-900)" }}>
+                      {f.q}
+                    </summary>
+                    <p style={{ padding: "0 20px 18px", fontSize: 15, color: "var(--neutral-700)", lineHeight: 1.8, margin: 0 }}>{f.a}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Related */}
           {(related?.length ?? 0) > 0 && (

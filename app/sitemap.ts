@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getAllReviews } from "@/lib/reviews";
+import { getApprovedQuestions } from "@/lib/qa";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://doctermatee.co.th";
@@ -15,8 +16,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: siteUrl, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
     { url: `${siteUrl}/products`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
     { url: `${siteUrl}/reviews`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${siteUrl}/qa`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
     { url: `${siteUrl}/articles`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
   ];
+
+  const qaRoutes: MetadataRoute.Sitemap = (await getApprovedQuestions()).map((q) => ({
+    url: `${siteUrl}/qa/${q.slug}`,
+    lastModified: new Date(q.created_at),
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }));
 
   const reviewRoutes: MetadataRoute.Sitemap = (await getAllReviews()).map((r) => ({
     url: `${siteUrl}/reviews/${r.slug}`,
@@ -39,5 +48,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...reviewRoutes, ...productRoutes, ...articleRoutes];
+  return [...staticRoutes, ...reviewRoutes, ...qaRoutes, ...productRoutes, ...articleRoutes];
 }

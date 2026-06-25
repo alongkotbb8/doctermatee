@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { IconCheck, IconTrash } from "@/components/icons";
+import { IconCheck, IconTrash, IconPlus } from "@/components/icons";
+
+interface ArticleFAQ { q: string; a: string }
 
 interface ArticleData {
   id?: string;
@@ -14,6 +16,7 @@ interface ArticleData {
   cover_image: string | null;
   read_time_min: number | null;
   is_published: boolean;
+  faq?: ArticleFAQ[] | null;
 }
 
 interface Props { article?: ArticleData }
@@ -35,6 +38,7 @@ export default function ArticleForm({ article }: Props) {
   const [coverImage, setCoverImage] = useState(article?.cover_image ?? "");
   const [readTime, setReadTime] = useState(String(article?.read_time_min ?? "5"));
   const [isPublished, setIsPublished] = useState(article?.is_published ?? false);
+  const [faq, setFaq] = useState<ArticleFAQ[]>(article?.faq ?? []);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
@@ -49,6 +53,7 @@ export default function ArticleForm({ article }: Props) {
       read_time_min: parseInt(readTime) || 5,
       is_published: isPublished,
       published_at: isPublished ? new Date().toISOString() : null,
+      faq: faq.filter((f) => f.q.trim() && f.a.trim()),
     };
     if (isEdit) {
       const { error: e } = await supabase.from("articles").update(payload).eq("id", article!.id!);
@@ -73,6 +78,10 @@ export default function ArticleForm({ article }: Props) {
   const inp = { width: "100%", height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", padding: "0 16px", fontSize: 14, fontFamily: "var(--font-body)", outline: "none" } as React.CSSProperties;
   const foc = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = "var(--teal-600)"; };
   const blr = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = "var(--neutral-200)"; };
+
+  const addFaq = () => setFaq((f) => [...f, { q: "", a: "" }]);
+  const upFaq = (i: number, patch: Partial<ArticleFAQ>) => setFaq((f) => f.map((x, j) => (j === i ? { ...x, ...patch } : x)));
+  const rmFaq = (i: number) => setFaq((f) => f.filter((_, j) => j !== i));
 
   return (
     <div>
@@ -115,6 +124,28 @@ export default function ArticleForm({ article }: Props) {
               style={{ ...inp, height: "auto", padding: "12px 14px", resize: "vertical", fontFamily: "monospace", fontSize: 13, lineHeight: 1.6 }}
               placeholder="<h2>หัวข้อ</h2><p>เนื้อหา...</p>" onFocus={foc} onBlur={blr} />
             <p style={{ fontSize: 12, color: "var(--neutral-400)", marginTop: 6 }}>รองรับ HTML: h2, h3, p, ul, ol, strong, a, img, blockquote</p>
+          </div>
+
+          {/* FAQ → FAQPage schema */}
+          <div className="card" style={{ padding: "22px 24px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+              <label style={{ ...lbl, marginBottom: 0 }}>คำถามที่พบบ่อย (FAQ) — สร้าง FAQPage schema ให้ Google</label>
+              <button type="button" onClick={addFaq} style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "var(--teal-50)", color: "var(--teal-700)", border: "1px solid var(--teal-200)", borderRadius: "var(--radius-full)", padding: "6px 14px", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 13, cursor: "pointer" }}>
+                <IconPlus size={14} color="var(--teal-700)" /> เพิ่ม
+              </button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 12 }}>
+              {faq.map((f, i) => (
+                <div key={i} style={{ border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-md)", padding: 14, background: "var(--neutral-50)" }}>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <input value={f.q} onChange={(e) => upFaq(i, { q: e.target.value })} style={{ ...inp, flex: 1 }} placeholder="คำถาม" onFocus={foc} onBlur={blr} />
+                    <button type="button" onClick={() => rmFaq(i)} style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, padding: "8px 10px", cursor: "pointer", flexShrink: 0 }}><IconTrash size={13} color="#EF4444" /></button>
+                  </div>
+                  <textarea value={f.a} onChange={(e) => upFaq(i, { a: e.target.value })} rows={2} style={{ ...inp, height: "auto", padding: "10px 14px", resize: "vertical", marginTop: 8 }} placeholder="คำตอบ" onFocus={foc} onBlur={blr} />
+                </div>
+              ))}
+              {faq.length === 0 && <p style={{ fontSize: 13, color: "var(--neutral-400)", textAlign: "center", padding: "12px 0" }}>ยังไม่มี FAQ — ไม่บังคับ แต่ช่วยให้ขึ้น rich result บน Google</p>}
+            </div>
           </div>
         </div>
 

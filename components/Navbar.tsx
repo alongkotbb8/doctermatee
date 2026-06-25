@@ -10,7 +10,9 @@ import Logo from "./Logo";
 const LINKS = [
   { href: "/", label: "หน้าแรก" },
   { href: "/products", label: "สินค้า" },
+  { href: "/reviews", label: "รีวิว" },
   { href: "/articles", label: "บทความ" },
+  { href: "/qa", label: "ถาม-ตอบ" },
   { href: "/about", label: "เกี่ยวกับเรา" },
 ];
 
