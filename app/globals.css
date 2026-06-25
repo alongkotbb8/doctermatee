@@ -387,8 +387,8 @@ img { max-width: 100%; display: block; }
   .nav-search { display: none !important; }
 }
 
-/* ── หมวดหมู่หน้าแรก: เลื่อนแนวนอนบนมือถือ ไม่ล้นขอบ ──── */
-@media (max-width: 600px) {
+/* ── หมวดหมู่หน้าแรก: เลื่อนแนวนอนบนมือถือ/แท็บเล็ต ไม่ล้นขอบ ──── */
+@media (max-width: 768px) {
   .cat-grid {
     display: flex !important;
     overflow-x: auto;
@@ -399,6 +399,9 @@ img { max-width: 100%; display: block; }
   }
   .cat-grid::-webkit-scrollbar { display: none; }
   .cat-grid > * { flex: 0 0 42%; }
+}
+@media (max-width: 480px) {
+  .cat-grid > * { flex: 0 0 60%; }
 }
 
 /* บทความปักหมุดหน้าแรก: รูป/เนื้อหา ยุบเป็นคอลัมน์เดียวบนมือถือ */

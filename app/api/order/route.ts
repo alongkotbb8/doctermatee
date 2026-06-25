@@ -132,5 +132,16 @@ export async function POST(req: NextRequest) {
     if (cur) await service.from("coupons").update({ used_count: cur.used_count + 1 }).eq("code", validCouponCode);
   }
 
+  // FR1: บันทึกที่อยู่ผูกกับบัญชี (ฝั่ง server ด้วย service client — เลี่ยง RLS ให้เซฟได้ชัวร์)
+  // เพื่อ pre-fill ที่อยู่ครบทุกช่องในการสั่งซื้อครั้งถัดไป
+  if (user) {
+    await service.from("profiles").upsert({
+      id: user.id,
+      full_name: shipping_address.full_name,
+      phone: shipping_address.phone,
+      default_address: shipping_address,
+    }, { onConflict: "id" });
+  }
+
   return NextResponse.json({ order_id: order.id, total });
 }

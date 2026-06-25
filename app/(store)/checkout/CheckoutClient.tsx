@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { useCart } from "@/store/cart";
-import { createClient } from "@/lib/supabase/client";
 import { IconTag, IconTruck, IconShield, IconPill, IconCreditCard, IconQr } from "@/components/icons";
 import Link from "next/link";
 import Image from "next/image";
@@ -108,16 +107,8 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
       return;
     }
 
-    // FR1: auto-save ที่อยู่ผูกกับบัญชี (ถ้า login) เพื่อ pre-fill ครั้งถัดไป
-    if (user) {
-      const supabase = createClient();
-      await supabase.from("profiles").upsert({
-        id: user.id,
-        full_name: fullName,
-        phone,
-        default_address: { full_name: fullName, phone, email, address, district, province, postal_code: postalCode },
-      }, { onConflict: "id" }).then(() => {}, () => {});
-    }
+    // FR1: ที่อยู่ถูกบันทึกผูกบัญชีฝั่ง server แล้วใน /api/order (service client ข้าม RLS)
+    // → pre-fill ครบทุกช่องในการสั่งซื้อครั้งถัดไป
 
     // ไม่ล้าง cart ที่นี่ — จะล้างหลังชำระเงินสำเร็จในหน้า /payment
     placedRef.current = true;
