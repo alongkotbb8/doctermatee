@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getSettings } from "@/lib/data";
 import { IconPhone, IconMail, IconClock, IconCreditCard, IconQr } from "./icons";
-import Logo from "./Logo";
 
 export default async function Footer() {
   const settings = await getSettings();
@@ -14,9 +13,9 @@ export default async function Footer() {
       <div className="wrap">
         <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr 1.2fr", gap: 32, marginBottom: 36 }}>
           <div>
-            <div style={{ marginBottom: 14 }}>
-              <Logo size={28} dark />
-            </div>
+            <Link href="/" style={{ display: "inline-block", fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 22, letterSpacing: "-0.02em", color: "#fff", textDecoration: "none", marginBottom: 14 }}>
+              Doctermatee
+            </Link>
             <p style={{ fontSize: 14, lineHeight: 1.8 }}>ร้านอาหารเสริม วิตามิน และผลิตภัณฑ์ดูแลสุขภาพ ที่คัดสรรของแท้มีเลข อย. พร้อมคำแนะนำจากแพทย์ผู้เชี่ยวชาญ</p>
             <div style={{ display: "flex", gap: 10, marginTop: 16, color: "#5DCAA5" }}>
               <IconCreditCard size={22} color="#5DCAA5" />
