@@ -3,6 +3,8 @@ import { getActiveProducts, getCategories, getPublishedArticles, getSettings, ge
 import ProductCard from "@/components/ProductCard";
 import CategoryCard from "@/components/CategoryCard";
 import HeroCarousel from "@/components/HeroCarousel";
+import Stars from "@/components/Stars";
+import { getFeaturedReviews } from "@/lib/reviews";
 import Image from "next/image";
 import { IconLeaf, IconShield, IconTag, IconArrowRight, IconFlask, IconPill, IconPackage, IconStar, IconHeartPulse, IconClock } from "@/components/icons";
 
@@ -52,6 +54,7 @@ export default async function HomePage() {
   const promo = config.promo ?? {};
 
   const gridProducts = rawProducts.slice(0, 4);
+  const featuredReviews = getFeaturedReviews(3);
 
   return (
     <>
@@ -251,6 +254,45 @@ export default async function HomePage() {
                   </Link>
                 ))}
               </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── รีวิว & เปรียบเทียบ (AEO/GEO) ────────────────── */}
+      {featuredReviews.length > 0 && (
+        <section className="reveal" style={{ background: "#fff", padding: "16px 0 64px" }}>
+          <div className="wrap">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+              <div>
+                <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 28, letterSpacing: "-.02em", color: "var(--neutral-900)" }}>รีวิว & เปรียบเทียบ</h2>
+                <p style={{ color: "var(--neutral-500)", fontSize: 14, marginTop: 4 }}>เลือกยี่ห้อไหนดี? เภสัชกรเปรียบเทียบให้แล้ว พร้อมคะแนนและข้อดี-ข้อเสีย</p>
+              </div>
+              <Link href="/reviews" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: "var(--teal-700)", textDecoration: "none" }}>
+                ดูทั้งหมด <IconArrowRight size={14} color="var(--teal-700)" />
+              </Link>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
+              {featuredReviews.map((r, i) => {
+                const top = r.products.find((p) => p.highlight) ?? r.products[0];
+                return (
+                  <Link key={r.slug} href={`/reviews/${r.slug}`} className={`anim-fade-up d${Math.min(i + 1, 5)}`} style={{ textDecoration: "none" }}>
+                    <article className="card pcard-hover" style={{ padding: "22px 22px 24px", height: "100%", display: "flex", flexDirection: "column", transition: "box-shadow .2s, transform .2s" }}>
+                      <span style={{ alignSelf: "flex-start", background: "var(--teal-50)", color: "var(--teal-700)", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 12, padding: "4px 12px", borderRadius: "var(--radius-full)", marginBottom: 14 }}>{r.category}</span>
+                      <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 18, color: "var(--neutral-900)", lineHeight: 1.4, margin: "0 0 12px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{r.question}</h3>
+                      <p style={{ fontSize: 13.5, color: "var(--neutral-500)", lineHeight: 1.7, margin: "0 0 16px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{r.summary}</p>
+                      <div style={{ marginTop: "auto", paddingTop: 14, borderTop: "1px solid var(--neutral-100)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <Stars value={top.rating} size={14} />
+                          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--neutral-700)" }}>{top.rating.toFixed(1)}</span>
+                        </span>
+                        <span style={{ fontSize: 13, color: "var(--teal-600)", fontWeight: 600 }}>อ่านรีวิว →</span>
+                      </div>
+                    </article>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>

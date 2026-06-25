@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getActiveProducts } from "@/lib/data";
 import AddToCartButton from "@/components/AddToCartButton";
+import ProductReviews, { getProductRating } from "@/components/ProductReviews";
 import { IconPill, IconFlask, IconSparkles, IconBaby, IconHeartPulse, IconLeaf, IconTruck } from "@/components/icons";
 import type { Metadata } from "next";
 
@@ -42,8 +43,37 @@ export default async function ProductDetailPage({ params }: Props) {
   const catSlug = (product.categories as { slug: string } | null)?.slug ?? "";
   const icon = CAT_ICONS[catSlug] ?? <IconLeaf size={96} color="var(--teal-400)" />;
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://doctermatee.co.th";
+  const { avg, total } = getProductRating(product.id);
+
+  // Product + AggregateRating + Review (Schema.org) — ให้ AI/Google เข้าใจสินค้าและคะแนน
+  const productLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description ?? undefined,
+    image: product.images.length ? product.images : undefined,
+    sku: product.sku ?? undefined,
+    brand: { "@type": "Brand", name: "Doctermatee" },
+    offers: {
+      "@type": "Offer",
+      url: `${siteUrl}/products/${slug}`,
+      priceCurrency: "THB",
+      price: product.price,
+      availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: avg.toFixed(1),
+      reviewCount: total,
+      bestRating: 5,
+      worstRating: 1,
+    },
+  };
+
   return (
     <div style={{ padding: "32px 0 64px" }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }} />
       <div className="wrap">
         {/* Breadcrumb */}
         <nav style={{ fontSize: 13, color: "var(--neutral-500)", marginBottom: 24, display: "flex", gap: 8, alignItems: "center" }}>
@@ -145,6 +175,9 @@ export default async function ProductDetailPage({ params }: Props) {
             </p>
           </div>
         </div>
+
+        {/* คะแนนและรีวิวสินค้า */}
+        <ProductReviews productId={product.id} />
       </div>
     </div>
   );
