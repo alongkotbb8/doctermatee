@@ -73,6 +73,7 @@ export default async function ReviewDetailPage({ params }: Props) {
     "@type": "Article",
     headline: r.question,
     description: r.summary,
+    image: `${siteUrl}/OG.png`,
     datePublished: r.datePublished,
     dateModified: r.dateUpdated,
     author: { "@type": "Person", name: r.author, jobTitle: r.authorRole },

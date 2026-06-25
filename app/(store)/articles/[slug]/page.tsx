@@ -50,7 +50,7 @@ export default async function ArticlePage({ params }: Props) {
     "@type": "Article",
     headline: article.title,
     description: article.excerpt,
-    image: article.cover_image,
+    image: article.cover_image || `${siteUrl}/OG.png`,
     datePublished: article.published_at,
     dateModified: article.updated_at ?? article.published_at,
     author: { "@type": "Organization", name: "Doctermatee", url: siteUrl },
