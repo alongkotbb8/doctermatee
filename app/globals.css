@@ -281,7 +281,7 @@ img { max-width: 100%; display: block; }
 .nav-link {
   transition: background 0.15s var(--ease), color 0.15s var(--ease);
 }
-.nav-link:hover { background: var(--green-50) !important; color: var(--teal-700) !important; }
+.nav-link:hover { background: var(--color-primary) !important; color: #fff !important; }
 
 /* Icon button (header) */
 .icon-btn {

@@ -43,11 +43,11 @@ export default function Navbar() {
     <header
       style={{
         position: "sticky", top: 0, zIndex: 40,
-        background: scrolled ? "rgba(255,255,255,0.72)" : "#fff",
-        WebkitBackdropFilter: scrolled ? "saturate(180%) blur(18px)" : "none",
-        backdropFilter: scrolled ? "saturate(180%) blur(18px)" : "none",
-        borderBottom: scrolled ? "1px solid rgba(13,148,136,0.14)" : "1px solid var(--neutral-100)",
-        boxShadow: scrolled ? "0 8px 28px -12px rgba(13,148,136,0.28)" : "none",
+        background: scrolled ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.9)",
+        WebkitBackdropFilter: "saturate(180%) blur(20px)",
+        backdropFilter: "saturate(180%) blur(20px)",
+        borderBottom: scrolled ? "1px solid rgba(13,148,136,0.12)" : "1px solid var(--neutral-100)",
+        boxShadow: scrolled ? "0 8px 30px -14px rgba(13,148,136,0.25)" : "none",
         transition: "background .25s var(--ease), box-shadow .25s var(--ease), border-color .25s var(--ease)",
       }}
     >
@@ -59,8 +59,8 @@ export default function Navbar() {
           {open ? <IconX size={20} color="currentColor" /> : <IconMenu size={20} color="currentColor" />}
         </button>
 
-        {/* Logo */}
-        <Logo size={34} />
+        {/* Logo (เฉพาะโลโก้ ไม่มีตัวอักษร) */}
+        <Logo size={40} iconOnly />
 
         {/* Nav links (เดสก์ท็อป) */}
         <nav className="nav-links" style={{ display: "flex", alignItems: "center", gap: 2 }}>

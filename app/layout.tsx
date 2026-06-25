@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     images: [{ url: "/OG.png", width: 1080, height: 1080, alt: "Doctermatee" }],
   },
   twitter: { card: "summary_large_image", images: ["/OG.png"] },
-  icons: { icon: "/logo.svg", apple: "/OG.png" },
+  icons: { apple: "/OG.png" },
   alternates: { canonical: siteUrl },
 };
 
