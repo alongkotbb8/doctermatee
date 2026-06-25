@@ -43,6 +43,7 @@ create table if not exists public.product_reviews (
   title       text,
   body        text not null,
   status      text not null default 'pending' check (status in ('pending','approved','rejected')),
+  verified_purchase boolean not null default false,
   created_at  timestamptz not null default now()
 );
 
@@ -53,9 +54,11 @@ alter table public.product_reviews enable row level security;
 -- เห็นเฉพาะรีวิวที่อนุมัติแล้ว (admin เห็นหมด)
 create policy "Anyone can view approved product reviews"
   on public.product_reviews for select using (status = 'approved' or public.is_admin());
--- ผู้ใช้ที่ล็อกอินส่งรีวิวของตัวเองได้ (เริ่มที่สถานะ pending)
+-- ผู้ใช้ที่ล็อกอินส่งรีวิวของตัวเองได้ — บังคับให้เริ่มที่ pending และห้ามตั้ง verified เอง
+-- (กันการ insert ตรงผ่าน supabase-js เพื่อ self-approve / ปลอม verified buyer)
 create policy "Logged-in users can submit product reviews"
-  on public.product_reviews for insert with check (auth.uid() = user_id);
+  on public.product_reviews for insert
+  with check (auth.uid() = user_id and status = 'pending' and verified_purchase = false);
 -- admin จัดการ/อนุมัติ/ลบได้ทั้งหมด
 create policy "Admin can manage product reviews"
   on public.product_reviews for all using (public.is_admin());

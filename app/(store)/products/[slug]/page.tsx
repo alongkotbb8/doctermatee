@@ -4,6 +4,7 @@ import { getActiveProducts } from "@/lib/data";
 import AddToCartButton from "@/components/AddToCartButton";
 import ProductReviews from "@/components/ProductReviews";
 import { getProductRating } from "@/lib/productReviews";
+import { jsonLd } from "@/lib/jsonld";
 import { IconPill, IconFlask, IconSparkles, IconBaby, IconHeartPulse, IconLeaf, IconTruck } from "@/components/icons";
 import type { Metadata } from "next";
 
@@ -78,7 +79,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
   return (
     <div style={{ padding: "32px 0 64px" }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(productLd) }} />
       <div className="wrap">
         {/* Breadcrumb */}
         <nav style={{ fontSize: 13, color: "var(--neutral-500)", marginBottom: 24, display: "flex", gap: 8, alignItems: "center" }}>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getAllReviews } from "@/lib/reviews";
+import { jsonLd } from "@/lib/jsonld";
 import Stars from "@/components/Stars";
 import { IconArrowRight, IconClock } from "@/components/icons";
 
@@ -31,7 +32,7 @@ export default async function ReviewsIndexPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(listLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(listLd) }} />
       <div style={{ padding: "40px 0 72px" }}>
         <div className="wrap">
           {/* Breadcrumb */}

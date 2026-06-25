@@ -50,7 +50,8 @@ export default async function ProductReviews({ productId }: { productId: string 
                   <div style={{ minWidth: 0 }}>
                     <p style={{ fontSize: 13.5, fontWeight: 700, color: "var(--neutral-800)", margin: 0 }}>{r.author_name}</p>
                     <p style={{ fontSize: 11.5, color: "var(--neutral-400)", margin: 0 }}>
-                      {new Date(r.created_at).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" })} · ผู้ซื้อจริง
+                      {new Date(r.created_at).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" })}
+                      {r.verified_purchase && <span style={{ color: "var(--teal-600)", fontWeight: 600 }}> · ✓ ผู้ซื้อจริง</span>}
                     </p>
                   </div>
                 </div>

@@ -26,6 +26,28 @@ export async function POST(req: NextRequest) {
   const { data: product } = await service.from("products").select("id").eq("id", product_id).single();
   if (!product) return NextResponse.json({ error: "ไม่พบสินค้า" }, { status: 404 });
 
+  // กันรีวิวซ้ำ: 1 ผู้ใช้ ต่อ 1 สินค้า (ที่ยังไม่ถูกปฏิเสธ)
+  const { data: dup } = await service
+    .from("product_reviews")
+    .select("id")
+    .eq("product_id", product_id)
+    .eq("user_id", user.id)
+    .neq("status", "rejected")
+    .limit(1);
+  if ((dup?.length ?? 0) > 0) {
+    return NextResponse.json({ error: "คุณได้รีวิวสินค้านี้ไปแล้ว" }, { status: 409 });
+  }
+
+  // ตรวจว่าเคยซื้อจริงไหม (มีออเดอร์ที่จ่ายเงินแล้วและมีสินค้านี้) → ใช้ตีตรา "ผู้ซื้อจริง"
+  const { data: bought } = await service
+    .from("order_items")
+    .select("id, orders!inner(user_id, payment_status)")
+    .eq("product_id", product_id)
+    .eq("orders.user_id", user.id)
+    .eq("orders.payment_status", "paid")
+    .limit(1);
+  const verifiedPurchase = (bought?.length ?? 0) > 0;
+
   // ชื่อผู้รีวิว: จาก profile → email (กันการปลอมชื่อจาก client)
   const { data: profile } = await service.from("profiles").select("full_name").eq("id", user.id).single();
   const authorName = profile?.full_name?.trim() || (user.email ? user.email.split("@")[0] : "ลูกค้า Doctermatee");
@@ -38,6 +60,7 @@ export async function POST(req: NextRequest) {
     title,
     body: text,
     status: "pending",
+    verified_purchase: verifiedPurchase,
   });
   if (error) return NextResponse.json({ error: "ส่งรีวิวไม่สำเร็จ กรุณาลองใหม่" }, { status: 500 });
 

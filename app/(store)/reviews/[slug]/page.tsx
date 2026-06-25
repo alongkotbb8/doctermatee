@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getReview, getAllReviews } from "@/lib/reviews";
+import { jsonLd } from "@/lib/jsonld";
 import Stars from "@/components/Stars";
 import { IconArrowRight, IconCheck, IconX, IconShield, IconClock, IconUser } from "@/components/icons";
 
@@ -81,7 +82,7 @@ export default async function ReviewDetailPage({ params }: Props) {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([faqLd, productLd, articleLd]) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd([faqLd, productLd, articleLd]) }} />
 
       <div style={{ padding: "40px 0 80px" }}>
         <article style={{ maxWidth: 800, margin: "0 auto", padding: "0 24px" }}>
@@ -193,7 +194,7 @@ export default async function ReviewDetailPage({ params }: Props) {
                     </ul>
                   </div>
                 </div>
-                {p.productHref && (
+                {p.productHref && /^(\/|https:\/\/)/.test(p.productHref) && (
                   <Link href={p.productHref} style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 14, fontSize: 13.5, fontWeight: 600, color: "var(--teal-700)", textDecoration: "none" }}>
                     ดูสินค้าในร้าน <IconArrowRight size={13} color="var(--teal-700)" />
                   </Link>

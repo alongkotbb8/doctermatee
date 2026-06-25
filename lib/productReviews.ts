@@ -8,6 +8,7 @@ export interface PRReview {
   rating: number;
   title: string | null;
   body: string;
+  verified_purchase: boolean;
   created_at: string;
 }
 
@@ -27,7 +28,7 @@ export async function getApprovedReviews(productId: string): Promise<PRAggregate
         const s = createServiceClient();
         const { data, error } = await s
           .from("product_reviews")
-          .select("id, author_name, rating, title, body, created_at")
+          .select("id, author_name, rating, title, body, verified_purchase, created_at")
           .eq("product_id", productId)
           .eq("status", "approved")
           .order("created_at", { ascending: false });
