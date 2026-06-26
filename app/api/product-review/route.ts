@@ -65,6 +65,6 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: "ส่งรีวิวไม่สำเร็จ กรุณาลองใหม่" }, { status: 500 });
 
   // ถ้าแอดมินอนุมัติทันทีค่อย bust; ตอนนี้ pending ยังไม่โชว์ แต่ revalidate เผื่อ moderation
-  revalidateTag("product-reviews", "max");
+  revalidateTag("product-reviews");
   return NextResponse.json({ ok: true });
 }

@@ -28,6 +28,6 @@ export async function POST(req: NextRequest) {
   });
   if (error) return NextResponse.json({ error: "ส่งคำตอบไม่สำเร็จ กรุณาลองใหม่" }, { status: 500 });
 
-  revalidateTag("qa", "max");
+  revalidateTag("qa");
   return NextResponse.json({ ok: true });
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
+import { revalidateTag, revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 // ล้าง cache ของหน้าร้านเมื่อแอดมินแก้ข้อมูล (admin เท่านั้น)
@@ -10,12 +10,21 @@ export async function POST(req: NextRequest) {
   const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
   if (profile?.role !== "admin") return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
-  let tags: string[] = ["catalog", "articles", "settings"];
+  let tags: string[] = ["catalog", "articles", "banners", "settings"];
   try {
     const body = await req.json();
     if (Array.isArray(body?.tags) && body.tags.length) tags = body.tags;
   } catch { /* ใช้ default */ }
 
-  tags.forEach((t) => revalidateTag(t, "max"));
+  // ล้าง Data Cache
+  tags.forEach((t) => revalidateTag(t));
+
+  // ล้าง Full Route Cache ของหน้าที่เกี่ยวข้อง
+  if (tags.includes("articles"))  revalidatePath("/articles", "layout");
+  if (tags.includes("catalog"))   revalidatePath("/products", "layout");
+  if (tags.includes("banners") || tags.includes("catalog") || tags.includes("articles")) {
+    revalidatePath("/", "layout");
+  }
+
   return NextResponse.json({ ok: true, revalidated: tags });
 }
