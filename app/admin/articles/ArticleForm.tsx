@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
-import { IconCheck, IconTrash, IconPlus } from "@/components/icons";
+import { IconCheck, IconTrash, IconPlus, IconUpload, IconImage } from "@/components/icons";
 
 interface ArticleFAQ { q: string; a: string }
 
@@ -42,6 +43,41 @@ export default function ArticleForm({ article }: Props) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingContent, setUploadingContent] = useState(false);
+  const coverFileRef = useRef<HTMLInputElement>(null);
+  const contentFileRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+
+  async function uploadCover(file: File) {
+    setUploadingCover(true);
+    const supabase = createClient();
+    const ext = file.name.split(".").pop();
+    const path = `articles/${Date.now()}-cover.${ext}`;
+    const { error: upErr } = await supabase.storage.from("product-images").upload(path, file, { upsert: true });
+    if (upErr) { setError("อัปโหลดรูปไม่สำเร็จ"); setUploadingCover(false); return; }
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    setCoverImage(data.publicUrl);
+    setUploadingCover(false);
+  }
+
+  async function uploadContentImage(file: File) {
+    setUploadingContent(true);
+    const supabase = createClient();
+    const ext = file.name.split(".").pop();
+    const path = `articles/${Date.now()}-content.${ext}`;
+    const { error: upErr } = await supabase.storage.from("product-images").upload(path, file, { upsert: true });
+    if (upErr) { setError("อัปโหลดรูปไม่สำเร็จ"); setUploadingContent(false); return; }
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    // แทรก <img> ที่ cursor position ใน textarea
+    const ta = contentRef.current;
+    if (ta) {
+      const start = ta.selectionStart ?? content.length;
+      const tag = `<img src="${data.publicUrl}" alt="" style="max-width:100%;border-radius:10px;margin:16px 0;" />`;
+      setContent((prev) => prev.slice(0, start) + "\n" + tag + "\n" + prev.slice(start));
+    }
+    setUploadingContent(false);
+  }
 
   async function save() {
     if (!title || !slug) { setError("กรุณาใส่ชื่อบทความและ slug"); return; }
@@ -112,18 +148,55 @@ export default function ArticleForm({ article }: Props) {
                 style={{ ...inp, height: "auto", padding: "10px 14px", resize: "vertical" }}
                 placeholder="สรุปสั้นๆ เพื่อแสดงในรายการบทความ" onFocus={foc} onBlur={blr} />
             </div>
+            {/* Cover image upload */}
             <div>
-              <label style={lbl}>รูปภาพ (URL)</label>
-              <input value={coverImage} onChange={(e) => setCoverImage(e.target.value)} style={inp} placeholder="https://..." onFocus={foc} onBlur={blr} />
+              <label style={lbl}>รูปหน้าปก</label>
+              <input ref={coverFileRef} type="file" accept="image/*" style={{ display: "none" }}
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadCover(f); }} />
+              {coverImage ? (
+                <div style={{ position: "relative", borderRadius: 10, overflow: "hidden", marginBottom: 8 }}>
+                  <div style={{ position: "relative", width: "100%", aspectRatio: "16/9" }}>
+                    <Image src={coverImage} alt="cover" fill style={{ objectFit: "cover" }} sizes="700px" />
+                  </div>
+                  <button type="button" onClick={() => setCoverImage("")}
+                    style={{ position: "absolute", top: 8, right: 8, background: "#fff", border: "none", borderRadius: "50%", width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,.15)" }}>
+                    <IconTrash size={14} color="#EF4444" />
+                  </button>
+                </div>
+              ) : (
+                <button type="button" onClick={() => coverFileRef.current?.click()} disabled={uploadingCover}
+                  style={{ width: "100%", height: 130, border: "2px dashed var(--neutral-200)", borderRadius: 10, background: "var(--neutral-50)", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, color: "var(--neutral-400)", transition: "border-color .2s" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--teal-400)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--neutral-200)")}>
+                  {uploadingCover ? <IconImage size={26} color="var(--teal-400)" /> : <IconUpload size={26} color="currentColor" />}
+                  <span style={{ fontSize: 13 }}>{uploadingCover ? "กำลังอัปโหลด…" : "คลิกเพื่ออัปโหลดรูปหน้าปก"}</span>
+                  <span style={{ fontSize: 11, color: "var(--neutral-300)" }}>JPG, PNG, WebP — แนะนำ 1200×630px</span>
+                </button>
+              )}
+              {/* fallback URL input */}
+              <input value={coverImage} onChange={(e) => setCoverImage(e.target.value)} style={{ ...inp, marginTop: 8, fontSize: 12, color: "var(--neutral-500)" }}
+                placeholder="หรือวาง URL รูปภาพ https://..." onFocus={foc} onBlur={blr} />
             </div>
           </div>
 
           <div className="card" style={{ padding: "22px 24px" }}>
-            <label style={lbl}>เนื้อหาบทความ (HTML)</label>
-            <textarea value={content} onChange={(e) => setContent(e.target.value)} rows={20}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+              <label style={{ ...lbl, marginBottom: 0 }}>เนื้อหาบทความ (HTML)</label>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input ref={contentFileRef} type="file" accept="image/*" style={{ display: "none" }}
+                  onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadContentImage(f); e.currentTarget.value = ""; }} />
+                <button type="button" onClick={() => contentFileRef.current?.click()} disabled={uploadingContent}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 6, background: uploadingContent ? "var(--neutral-100)" : "var(--teal-50)", color: "var(--teal-700)", border: "1px solid var(--teal-200)", borderRadius: "var(--radius-full)", padding: "6px 14px", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 13, cursor: "pointer" }}>
+                  {uploadingContent
+                    ? <><IconImage size={14} color="var(--teal-400)" /> กำลังอัปโหลด…</>
+                    : <><IconUpload size={14} color="var(--teal-700)" /> แทรกรูปภาพ</>}
+                </button>
+              </div>
+            </div>
+            <textarea ref={contentRef} value={content} onChange={(e) => setContent(e.target.value)} rows={20}
               style={{ ...inp, height: "auto", padding: "12px 14px", resize: "vertical", fontFamily: "monospace", fontSize: 13, lineHeight: 1.6 }}
               placeholder="<h2>หัวข้อ</h2><p>เนื้อหา...</p>" onFocus={foc} onBlur={blr} />
-            <p style={{ fontSize: 12, color: "var(--neutral-400)", marginTop: 6 }}>รองรับ HTML: h2, h3, p, ul, ol, strong, a, img, blockquote</p>
+            <p style={{ fontSize: 12, color: "var(--neutral-400)", marginTop: 6 }}>รองรับ HTML: h2, h3, p, ul, ol, strong, a, img, blockquote · ปุ่ม "แทรกรูปภาพ" จะแทรก &lt;img&gt; ที่ตำแหน่ง cursor</p>
           </div>
 
           {/* FAQ → FAQPage schema */}
