@@ -27,9 +27,21 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
   const [phone, setPhone] = useState(profile?.phone ?? addr.phone ?? "");
   const [email, setEmail] = useState(user?.email ?? addr.email ?? "");
   const [address, setAddress] = useState(addr.address ?? "");
+  const [subdistrict, setSubdistrict] = useState(addr.subdistrict ?? "");
   const [district, setDistrict] = useState(addr.district ?? "");
   const [province, setProvince] = useState(addr.province ?? "");
   const [postalCode, setPostalCode] = useState(addr.postal_code ?? "");
+
+  // ใบกำกับภาษีเต็มรูป (ขอเพิ่มได้)
+  const [wantsFullInvoice, setWantsFullInvoice] = useState(false);
+  const [invBuyerType, setInvBuyerType] = useState<"company" | "person">("company");
+  const [invName, setInvName] = useState("");
+  const [invBranch, setInvBranch] = useState<"head" | "branch">("head");
+  const [invBranchCode, setInvBranchCode] = useState("");
+  const [invTaxId, setInvTaxId] = useState("");
+  const [invAddress, setInvAddress] = useState("");
+  const [invEmail, setInvEmail] = useState("");
+  const [invPhone, setInvPhone] = useState("");
 
   const [couponCode, setCouponCode] = useState("");
   const [couponStatus, setCouponStatus] = useState<"idle" | "checking" | "valid" | "invalid">("idle");
@@ -77,7 +89,7 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const required: Record<string, string> = { fullName, phone, email, address, district, province, postalCode };
+    const required: Record<string, string> = { fullName, phone, email, address, subdistrict, district, province, postalCode };
     const missing: Record<string, boolean> = {};
     Object.entries(required).forEach(([k, v]) => { if (!v.trim()) missing[k] = true; });
     if (Object.keys(missing).length > 0) {
@@ -85,17 +97,34 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
       setError("กรุณากรอกข้อมูลในช่องที่ไฮไลต์ให้ครบ");
       return;
     }
+    // ตรวจข้อมูลใบกำกับภาษีเต็มรูป (ถ้าขอ)
+    if (wantsFullInvoice) {
+      if (!invName.trim() || !invAddress.trim() || !/^\d{13}$/.test(invTaxId.trim())) {
+        setError("ขอใบกำกับภาษีเต็มรูป: กรุณากรอกชื่อ, ที่อยู่ และเลขประจำตัวผู้เสียภาษี 13 หลักให้ถูกต้อง");
+        return;
+      }
+    }
     setFieldErrors({});
     setSubmitting(true);
     setError("");
+
+    const taxInvoice = wantsFullInvoice
+      ? {
+          type: "full", buyer_type: invBuyerType, name: invName.trim(),
+          branch: invBranch, branch_code: invBranch === "branch" ? invBranchCode.trim() : "00000",
+          tax_id: invTaxId.trim(), address: invAddress.trim(),
+          email: invEmail.trim(), phone: invPhone.trim(),
+        }
+      : null;
 
     const res = await fetch("/api/order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         items: items.map((i) => ({ product_id: i.id, name: i.name, qty: i.qty, price: i.price })),
-        shipping_address: { full_name: fullName, phone, email, address, district, province, postal_code: postalCode },
+        shipping_address: { full_name: fullName, phone, email, address, subdistrict, district, province, postal_code: postalCode },
         coupon_code: couponData?.code ?? null,
+        tax_invoice: taxInvoice,
         subtotal, shipping, discount, total,
       }),
     });
@@ -123,6 +152,7 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
     padding: "0 16px", fontSize: 14, fontFamily: "var(--font-body)", outline: "none",
   };
   const inputNoIconStyle = inputStyle;
+  const lblInv: React.CSSProperties = { display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 5 };
 
   // ไฮไลต์ช่องที่กรอกไม่ครบเป็นสีแดง
   const fieldStyle = (key: string, base: React.CSSProperties) => ({
@@ -177,6 +207,13 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
                     onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={onBlurField("address")} />
                 </div>
 
+                {/* subdistrict (ตำบล/แขวง) */}
+                <div>
+                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 5 }}>ตำบล/แขวง *</label>
+                  <input value={subdistrict} onChange={(e) => { setSubdistrict(e.target.value); clearErr("subdistrict"); }} style={fieldStyle("subdistrict", inputNoIconStyle)} placeholder="ตำบล/แขวง"
+                    onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={onBlurField("subdistrict")} />
+                </div>
+
                 {/* district */}
                 <div>
                   <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 5 }}>เขต/อำเภอ *</label>
@@ -227,6 +264,65 @@ export default function CheckoutClient({ user, profile, freeThreshold = 500, sta
                 <p style={{ marginTop: 8, fontSize: 13, color: couponStatus === "valid" ? "var(--teal-600)" : "#EF4444", fontWeight: 500 }}>
                   {couponStatus === "valid" ? "✓ " : "✗ "}{couponMsg}
                 </p>
+              )}
+            </div>
+
+            {/* ใบกำกับภาษีเต็มรูป */}
+            <div className="card" style={{ padding: "20px 22px" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+                <input type="checkbox" checked={wantsFullInvoice} onChange={(e) => setWantsFullInvoice(e.target.checked)} style={{ width: 17, height: 17, accentColor: "var(--teal-600)" }} />
+                <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "var(--neutral-800)" }}>ขอใบกำกับภาษีแบบเต็มรูป</span>
+              </label>
+              <p style={{ fontSize: 12.5, color: "var(--neutral-500)", margin: "6px 0 0", paddingLeft: 27 }}>หากไม่ขอ ระบบจะออกใบกำกับภาษีอย่างย่อให้อัตโนมัติ</p>
+
+              {wantsFullInvoice && (
+                <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                  {/* ประเภท */}
+                  <div>
+                    <label style={lblInv}>ประเภท *</label>
+                    <select value={invBuyerType} onChange={(e) => setInvBuyerType(e.target.value as "company" | "person")} style={inputStyle} onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; }}>
+                      <option value="company">นิติบุคคล</option>
+                      <option value="person">บุคคลธรรมดา</option>
+                    </select>
+                  </div>
+                  {/* สำนักงานใหญ่/สาขา */}
+                  <div>
+                    <label style={lblInv}>สำนักงาน</label>
+                    <select value={invBranch} onChange={(e) => setInvBranch(e.target.value as "head" | "branch")} style={inputStyle} onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; }}>
+                      <option value="head">สำนักงานใหญ่</option>
+                      <option value="branch">สาขา</option>
+                    </select>
+                  </div>
+                  {/* ชื่อ */}
+                  <div style={{ gridColumn: "1 / -1" }}>
+                    <label style={lblInv}>{invBuyerType === "company" ? "ชื่อบริษัท/นิติบุคคล *" : "ชื่อ-นามสกุล *"}</label>
+                    <input value={invName} onChange={(e) => setInvName(e.target.value)} style={inputStyle} placeholder={invBuyerType === "company" ? "บริษัท ... จำกัด" : "ชื่อ-นามสกุล"} onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; }} />
+                  </div>
+                  {/* เลขผู้เสียภาษี */}
+                  <div>
+                    <label style={lblInv}>เลขประจำตัวผู้เสียภาษี (13 หลัก) *</label>
+                    <input value={invTaxId} onChange={(e) => setInvTaxId(e.target.value.replace(/\D/g, "").slice(0, 13))} style={inputStyle} placeholder="0000000000000" maxLength={13} onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; }} />
+                  </div>
+                  {/* เลขสาขา */}
+                  <div>
+                    <label style={lblInv}>เลขที่สาขา</label>
+                    <input value={invBranch === "head" ? "00000 (สำนักงานใหญ่)" : invBranchCode} onChange={(e) => setInvBranchCode(e.target.value.replace(/\D/g, "").slice(0, 5))} disabled={invBranch === "head"} style={{ ...inputStyle, background: invBranch === "head" ? "var(--neutral-50)" : "#fff", color: invBranch === "head" ? "var(--neutral-400)" : "inherit" }} placeholder="00001" onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; }} />
+                  </div>
+                  {/* ที่อยู่ */}
+                  <div style={{ gridColumn: "1 / -1" }}>
+                    <label style={lblInv}>ที่อยู่สำหรับออกใบกำกับภาษี *</label>
+                    <textarea value={invAddress} onChange={(e) => setInvAddress(e.target.value)} rows={2} style={{ ...inputStyle, height: "auto", padding: "10px 16px", resize: "vertical" }} placeholder="ที่อยู่ตามที่จดทะเบียน" onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; }} />
+                  </div>
+                  {/* email + phone */}
+                  <div>
+                    <label style={lblInv}>อีเมล</label>
+                    <input value={invEmail} onChange={(e) => setInvEmail(e.target.value)} style={inputStyle} placeholder="email@example.com" onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; }} />
+                  </div>
+                  <div>
+                    <label style={lblInv}>เบอร์โทร</label>
+                    <input value={invPhone} onChange={(e) => setInvPhone(e.target.value)} style={inputStyle} placeholder="08X-XXX-XXXX" onFocus={(e) => { e.target.style.borderColor = "var(--teal-600)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--neutral-200)"; }} />
+                  </div>
+                </div>
               )}
             </div>
 

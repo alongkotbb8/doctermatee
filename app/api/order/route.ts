@@ -9,12 +9,17 @@ function generateOrderNo(): string {
   return `DM${ymd}${rand}`;
 }
 
-const ADDR_FIELDS = ["full_name", "phone", "address", "district", "province", "postal_code"];
+const ADDR_FIELDS = ["full_name", "phone", "address", "subdistrict", "district", "province", "postal_code"];
+
+interface TaxInvoiceInput {
+  type?: string; buyer_type?: string; name?: string; branch?: string; branch_code?: string;
+  tax_id?: string; address?: string; email?: string; phone?: string;
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
   // ⚠️ ไม่เชื่อราคา/ยอดรวม/ส่วนลดจาก client — ใช้เฉพาะ items, ที่อยู่, โค้ดคูปอง
-  const { items, shipping_address, coupon_code } = body;
+  const { items, shipping_address, coupon_code, tax_invoice } = body;
 
   // --- ตรวจรูปแบบข้อมูล ---
   if (!Array.isArray(items) || items.length === 0 || items.length > 50) {
@@ -92,6 +97,28 @@ export async function POST(req: NextRequest) {
 
   const total = Math.max(0, Math.round((subtotal + shipping - discount) * 100) / 100);
 
+  // --- คำขอใบกำกับภาษีเต็มรูป (ถ้ามี) — sanitize ฝั่ง server ---
+  let taxInvoiceData: object | null = null;
+  if (tax_invoice && (tax_invoice as TaxInvoiceInput).type === "full") {
+    const t = tax_invoice as TaxInvoiceInput;
+    const taxId = String(t.tax_id ?? "").replace(/\D/g, "");
+    if (!t.name?.trim() || !t.address?.trim() || taxId.length !== 13) {
+      return NextResponse.json({ error: "ข้อมูลใบกำกับภาษีไม่ครบ (ชื่อ/ที่อยู่/เลขผู้เสียภาษี 13 หลัก)" }, { status: 400 });
+    }
+    const isBranch = t.branch === "branch";
+    taxInvoiceData = {
+      type: "full",
+      buyer_type: t.buyer_type === "person" ? "person" : "company",
+      name: String(t.name).slice(0, 200),
+      branch: isBranch ? "branch" : "head",
+      branch_code: isBranch ? String(t.branch_code ?? "").replace(/\D/g, "").slice(0, 5) || "00000" : "00000",
+      tax_id: taxId,
+      address: String(t.address).slice(0, 500),
+      email: t.email ? String(t.email).slice(0, 200) : "",
+      phone: t.phone ? String(t.phone).slice(0, 50) : "",
+    };
+  }
+
   // ผู้ใช้ (ถ้ามี — รองรับ guest)
   const userSupabase = await createClient();
   const { data: { user } } = await userSupabase.auth.getUser();
@@ -107,6 +134,7 @@ export async function POST(req: NextRequest) {
       payment_status: "unpaid",
       shipping_address,
       coupon_code: validCouponCode,
+      tax_invoice: taxInvoiceData,
       subtotal,
       shipping_fee: shipping,
       discount,

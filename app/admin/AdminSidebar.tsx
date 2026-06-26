@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IconBarChart, IconPackage, IconTag, IconTruck, IconSettings, IconUser, IconEdit, IconArrowRight, IconImage, IconStar, IconStethoscope } from "@/components/icons";
+import { IconBarChart, IconPackage, IconTag, IconTruck, IconSettings, IconUser, IconEdit, IconArrowRight, IconImage, IconStar, IconStethoscope, IconCreditCard } from "@/components/icons";
 
 const NAV = [
   { href: "/admin",                label: "แดชบอร์ด",     icon: <IconBarChart size={17} color="currentColor" /> },
   { href: "/admin/orders",         label: "ออเดอร์",       icon: <IconTruck size={17} color="currentColor" /> },
+  { href: "/admin/tax-invoices",   label: "ใบกำกับภาษี",   icon: <IconCreditCard size={17} color="currentColor" /> },
   { href: "/admin/products",       label: "สินค้า",        icon: <IconPackage size={17} color="currentColor" /> },
   { href: "/admin/coupons",        label: "คูปอง",         icon: <IconTag size={17} color="currentColor" /> },
   { href: "/admin/articles",       label: "บทความ",        icon: <IconEdit size={17} color="currentColor" /> },

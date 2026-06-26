@@ -15,7 +15,7 @@ export default async function AdminOrders({ searchParams }: { searchParams: Prom
 
   let query = supabase
     .from("orders")
-    .select("id, order_no, total, status, payment_status, created_at, tracking_no, shipping_address")
+    .select("id, order_no, total, status, payment_status, created_at, tracking_no, shipping_address, tax_invoice")
     .order("created_at", { ascending: false });
 
   if (status) query = query.eq("status", status);
@@ -57,9 +57,17 @@ export default async function AdminOrders({ searchParams }: { searchParams: Prom
             {(orders ?? []).map((o) => {
               const s = STATUS[o.status] ?? STATUS.pending;
               const addr = o.shipping_address as Record<string, string>;
+              const wantsFull = (o.tax_invoice as { type?: string } | null)?.type === "full";
               return (
                 <tr key={o.id} style={{ borderBottom: "1px solid var(--neutral-50)" }}>
-                  <td style={{ padding: "14px 16px", fontSize: 14, fontWeight: 700, color: "var(--teal-700)" }}>#{o.order_no}</td>
+                  <td style={{ padding: "14px 16px", fontSize: 14, fontWeight: 700, color: "var(--teal-700)" }}>
+                    #{o.order_no}
+                    {wantsFull && (
+                      <span title="ลูกค้าขอใบกำกับภาษีเต็มรูป" style={{ display: "block", marginTop: 4, background: "#FEF3C7", color: "#92400E", borderRadius: 99, padding: "2px 8px", fontSize: 10.5, fontWeight: 700, width: "fit-content" }}>
+                        🧾 ขอใบกำกับเต็มรูป
+                      </span>
+                    )}
+                  </td>
                   <td style={{ padding: "14px 16px", fontSize: 14, color: "var(--neutral-700)" }}>{addr?.full_name ?? "—"}<br /><span style={{ fontSize: 12, color: "var(--neutral-400)" }}>{addr?.phone}</span></td>
                   <td style={{ padding: "14px 16px", fontSize: 13, color: "var(--neutral-500)", whiteSpace: "nowrap" }}>
                     {new Date(o.created_at).toLocaleDateString("th-TH", { day: "2-digit", month: "short", year: "2-digit" })}
@@ -71,10 +79,15 @@ export default async function AdminOrders({ searchParams }: { searchParams: Prom
                   <td style={{ padding: "14px 16px", fontSize: 13, color: "var(--neutral-600)", fontFamily: "var(--font-display)", letterSpacing: ".04em" }}>
                     {o.tracking_no ?? <span style={{ color: "var(--neutral-300)" }}>—</span>}
                   </td>
-                  <td style={{ padding: "14px 16px" }}>
+                  <td style={{ padding: "14px 16px", whiteSpace: "nowrap" }}>
                     <Link href={`/admin/orders/${o.id}`} style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--teal-600)", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
                       จัดการ <IconArrowRight size={12} color="var(--teal-600)" />
                     </Link>
+                    {o.payment_status === "paid" && (
+                      <a href={`/admin/orders/${o.id}/tax-invoice`} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--neutral-500)", fontSize: 12.5, fontWeight: 600, textDecoration: "none", marginLeft: 12 }}>
+                        🧾 ใบกำกับ
+                      </a>
+                    )}
                   </td>
                 </tr>
               );

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { sendOrderConfirmEmail } from "@/lib/email";
+import { issueTaxInvoice } from "@/lib/taxInvoice";
 
 const OMISE_SECRET = process.env.OPN_SECRET_KEY ?? "";
 const OMISE_API = "https://api.omise.co";
@@ -100,6 +101,9 @@ export async function POST(req: NextRequest) {
 
     if (charge.status === "successful") {
       await service.from("orders").update({ payment_status: "paid", status: "paid" }).eq("id", order_id);
+
+      // ออกใบกำกับภาษี (ย่อ/เต็ม) — idempotent
+      await issueTaxInvoice(order_id);
 
       // Send confirmation email
       const { data: fullOrder } = await service

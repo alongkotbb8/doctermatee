@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { sendOrderConfirmEmail } from "@/lib/email";
+import { issueTaxInvoice } from "@/lib/taxInvoice";
 
 const OMISE_SECRET = process.env.OPN_SECRET_KEY ?? "";
 const OMISE_API = "https://api.omise.co";
@@ -61,6 +62,11 @@ export async function POST(req: NextRequest) {
       .neq("payment_status", "paid") // idempotent
       .select("id, order_no, total, subtotal, shipping_fee, discount, shipping_address, order_items(qty,price,products(name))")
       .single();
+
+    // ออกใบกำกับภาษี (ย่อ/เต็ม) — idempotent, เฉพาะตอนที่เพิ่งเปลี่ยนเป็น paid จริง
+    if (updated) {
+      await issueTaxInvoice(orderId);
+    }
 
     // Send confirmation email
     if (updated) {
