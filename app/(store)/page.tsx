@@ -165,13 +165,15 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            {/* แถวการ์ดสินค้าเท่ากัน */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 22 }}>
-              {gridProducts.map((p, i) => (
-                <div key={p.id} className={`anim-fade-up d${Math.min(i + 1, 5)}`}>
-                  <ProductCard product={p} />
-                </div>
-              ))}
+            {/* แถวการ์ดสินค้า: scroll แนวนอนบนมือถือ */}
+            <div className="product-scroll-wrap">
+              <div className="product-scroll-inner" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 22 }}>
+                {gridProducts.map((p, i) => (
+                  <div key={p.id} className={`anim-fade-up d${Math.min(i + 1, 5)}`}>
+                    <ProductCard product={p} />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>

@@ -90,7 +90,7 @@ export default function HeroCarousel({ banners }: { banners: Banner[] }) {
         </div>
 
         {/* Right visual */}
-        <div className="col-5" key={`vis-${i}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 340, position: "relative", animation: "heroInRight .95s cubic-bezier(.22,.61,.36,1) both" }}>
+        <div className="col-5 hero-visual" key={`vis-${i}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 340, position: "relative", animation: "heroInRight .95s cubic-bezier(.22,.61,.36,1) both" }}>
           {b.image ? (
             <Image src={b.image} alt={b.title ?? "banner"} width={600} height={380} style={{ width: "100%", maxHeight: 380, objectFit: "contain", borderRadius: "var(--radius-lg)" }} priority />
           ) : (

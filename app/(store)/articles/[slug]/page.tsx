@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { IconClock, IconArrowRight } from "@/components/icons";
+import ArticleLikeShare from "@/components/ArticleLikeShare";
 import { jsonLd, breadcrumbLd } from "@/lib/jsonld";
 
 export const revalidate = 60;
@@ -118,6 +119,9 @@ export default async function ArticlePage({ params }: Props) {
               <Image src={article.cover_image} alt={article.title} fill style={{ objectFit: "cover" }} sizes="760px" priority />
             </div>
           )}
+
+          {/* Like / Share */}
+          <ArticleLikeShare slug={slug} title={article.title} />
 
           {/* Content */}
           <div className="article-body" dangerouslySetInnerHTML={{ __html: article.content ?? "" }} />

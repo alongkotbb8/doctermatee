@@ -11,27 +11,23 @@ const FALLBACK_ICONS: Record<string, React.ReactNode> = {
 
 function QtyControl({ item }: { item: CartItem }) {
   const updateQty = useCart((s) => s.updateQty);
-  const removeItem = useCart((s) => s.removeItem);
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 0, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-full)", overflow: "hidden", height: 36 }}>
       <button
         onClick={() => updateQty(item.id, item.qty - 1)}
-        aria-label={item.qty === 1 ? "ลบสินค้า" : "ลดจำนวน"}
-        style={{ width: 36, height: 36, border: "none", background: "none", cursor: "pointer", color: item.qty === 1 ? "#EF4444" : "var(--neutral-600)", display: "flex", alignItems: "center", justifyContent: "center", transition: "background .15s" }}
-        onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "var(--neutral-100)")}
-        onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "none")}
+        disabled={item.qty <= 1}
+        aria-label="ลดจำนวน"
+        style={{ width: 36, height: 36, border: "none", background: "none", cursor: item.qty <= 1 ? "not-allowed" : "pointer", color: item.qty <= 1 ? "var(--neutral-300)" : "var(--neutral-600)", display: "flex", alignItems: "center", justifyContent: "center" }}
       >
-        {item.qty === 1 ? <IconTrash size={15} color="currentColor" /> : <IconMinus size={16} color="currentColor" />}
+        <IconMinus size={16} color="currentColor" />
       </button>
       <span style={{ minWidth: 32, textAlign: "center", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15 }}>{item.qty}</span>
       <button
         onClick={() => updateQty(item.id, item.qty + 1)}
         disabled={item.qty >= item.stock}
         aria-label="เพิ่มจำนวน"
-        style={{ width: 36, height: 36, border: "none", background: "none", cursor: item.qty >= item.stock ? "not-allowed" : "pointer", color: item.qty >= item.stock ? "var(--neutral-300)" : "var(--neutral-600)", display: "flex", alignItems: "center", justifyContent: "center", transition: "background .15s" }}
-        onMouseEnter={(e) => { if (item.qty < item.stock) (e.currentTarget as HTMLButtonElement).style.background = "var(--neutral-100)"; }}
-        onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "none")}
+        style={{ width: 36, height: 36, border: "none", background: "none", cursor: item.qty >= item.stock ? "not-allowed" : "pointer", color: item.qty >= item.stock ? "var(--neutral-300)" : "var(--neutral-600)", display: "flex", alignItems: "center", justifyContent: "center" }}
       >
         <IconPlus size={15} color="currentColor" />
       </button>
@@ -44,6 +40,7 @@ export default function CartPageClient({ freeThreshold = 500, standardFee = 50 }
   const clearCart = useCart((s) => s.clearCart);
   const totalItems = useCart((s) => s.totalItems());
   const totalPrice = useCart((s) => s.totalPrice());
+  const removeItem = useCart((s) => s.removeItem);
 
   const shippingFee = totalPrice >= freeThreshold ? 0 : standardFee;
   const grandTotal = totalPrice + shippingFee;
@@ -81,49 +78,50 @@ export default function CartPageClient({ freeThreshold = 500, standardFee = 50 }
           {/* Item list */}
           <div className="col-8" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {items.map((item) => (
-              <div key={item.id} className="anim-fade-up" style={{ display: "flex", gap: 16, padding: 18, background: "#fff", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-sm)", alignItems: "center" }}>
-                {/* Image */}
-                <div style={{ width: 88, height: 88, borderRadius: "var(--radius-md)", background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
-                  {item.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.image} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  ) : (
-                    FALLBACK_ICONS[item.category_name ?? ""] ?? <IconPill size={36} color="var(--teal-400)" />
-                  )}
-                </div>
+                <div key={item.id} className="cart-item anim-fade-up" style={{ display: "flex", flexWrap: "wrap", gap: 16, padding: 18, background: "#fff", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-sm)" }}>
+                  {/* Top row: image + info */}
+                  <div style={{ display: "flex", gap: 16, flex: 1, minWidth: 0, alignItems: "flex-start" }}>
+                    <div style={{ width: 88, height: 88, borderRadius: "var(--radius-md)", background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
+                      {item.image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={item.image} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      ) : (
+                        FALLBACK_ICONS[item.category_name ?? ""] ?? <IconPill size={36} color="var(--teal-400)" />
+                      )}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      {item.category_name && (
+                        <span style={{ fontSize: 11, color: "var(--teal-600)", fontWeight: 600, letterSpacing: ".04em", textTransform: "uppercase" }}>
+                          {item.category_name}
+                        </span>
+                      )}
+                      <Link href={`/products/${item.id}`} style={{ display: "block", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, color: "var(--neutral-900)", margin: "3px 0 6px", textDecoration: "none", lineHeight: 1.3 }}>
+                        {item.name}
+                      </Link>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        {item.compare_at_price && (
+                          <span style={{ fontSize: 12, color: "var(--neutral-400)", textDecoration: "line-through" }}>฿{item.compare_at_price.toLocaleString()}</span>
+                        )}
+                        <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, color: "var(--teal-600)" }}>฿{item.price.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
 
-                {/* Info */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  {item.category_name && (
-                    <span style={{ fontSize: 11, color: "var(--teal-600)", fontWeight: 600, letterSpacing: ".04em", textTransform: "uppercase" }}>
-                      {item.category_name}
-                    </span>
-                  )}
-                  <Link href={`/products/${item.id}`} style={{ display: "block", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, color: "var(--neutral-900)", margin: "3px 0 6px", textDecoration: "none", lineHeight: 1.3 }}>
-                    {item.name}
-                  </Link>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    {item.compare_at_price && (
-                      <span style={{ fontSize: 12, color: "var(--neutral-400)", textDecoration: "line-through" }}>
-                        ฿{item.compare_at_price.toLocaleString()}
-                      </span>
-                    )}
-                    <span style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, color: "var(--teal-600)" }}>
-                      ฿{item.price.toLocaleString()}
-                    </span>
+                  {/* Bottom row: trash (left) + qty + subtotal (right) */}
+                  <div className="cart-item-actions" style={{ display: "flex", alignItems: "center", gap: 12, width: "100%", justifyContent: "space-between" }}>
+                    <button
+                      onClick={() => removeItem(item.id)}
+                      aria-label="ลบสินค้า"
+                      style={{ width: 36, height: 36, border: "1px solid var(--neutral-200)", borderRadius: "50%", background: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#EF4444", flexShrink: 0 }}
+                    >
+                      <IconTrash size={15} color="currentColor" />
+                    </button>
+                    <QtyControl item={item} />
+                    <div style={{ textAlign: "right", minWidth: 70, fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, color: "var(--neutral-900)" }}>
+                      ฿{(item.price * item.qty).toLocaleString()}
+                    </div>
                   </div>
                 </div>
-
-                {/* Qty */}
-                <QtyControl item={item} />
-
-                {/* Subtotal */}
-                <div style={{ textAlign: "right", minWidth: 80 }}>
-                  <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, color: "var(--neutral-900)" }}>
-                    ฿{(item.price * item.qty).toLocaleString()}
-                  </div>
-                </div>
-              </div>
             ))}
           </div>
 
