@@ -133,9 +133,9 @@ export default async function HomePage() {
       {/* ── Stats / social proof ─────────────────────────── */}
       <section className="reveal" style={{ background: "#fff", padding: "16px 0 8px" }}>
         <div className="wrap">
-          <div className="stats-bar" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: "20px 8px", background: "linear-gradient(135deg,var(--green-50),#fff)", border: "1px solid var(--teal-100)", borderRadius: "var(--radius-lg)", padding: "24px 28px" }}>
+          <div className="stats-bar" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", background: "linear-gradient(135deg,var(--green-50),#fff)", border: "1px solid var(--teal-100)", borderRadius: "var(--radius-lg)", padding: "24px 28px" }}>
             {STATS.map((s, i) => (
-              <div key={s.label} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 13, flex: "1 1 0", minWidth: 180, borderLeft: i > 0 ? "1px solid var(--teal-100)" : "none" }}>
+              <div key={s.label} className="stats-item" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 13, borderLeft: i > 0 ? "1px solid var(--teal-100)" : "none", padding: "8px 0" }}>
                 <span style={{ width: 48, height: 48, borderRadius: 14, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "var(--shadow-sm)", flexShrink: 0 }}>{s.icon}</span>
                 <div>
                   <p style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 22, color: "var(--neutral-900)", letterSpacing: "-.02em" }}>{s.value}</p>

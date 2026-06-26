@@ -45,12 +45,12 @@ export default function Navbar() {
     <header
       style={{
         position: "sticky", top: 0, zIndex: 40,
-        background: scrolled ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.9)",
-        WebkitBackdropFilter: "saturate(180%) blur(20px)",
-        backdropFilter: "saturate(180%) blur(20px)",
-        borderBottom: scrolled ? "1px solid rgba(13,148,136,0.12)" : "1px solid var(--neutral-100)",
-        boxShadow: scrolled ? "0 8px 30px -14px rgba(13,148,136,0.25)" : "none",
-        transition: "background .25s var(--ease), box-shadow .25s var(--ease), border-color .25s var(--ease)",
+        background: scrolled ? "rgba(255,255,255,0.38)" : "rgba(255,255,255,0.72)",
+        WebkitBackdropFilter: scrolled ? "saturate(220%) blur(32px)" : "saturate(180%) blur(18px)",
+        backdropFilter: scrolled ? "saturate(220%) blur(32px)" : "saturate(180%) blur(18px)",
+        borderBottom: scrolled ? "1px solid rgba(13,148,136,0.1)" : "1px solid rgba(255,255,255,0.4)",
+        boxShadow: scrolled ? "0 8px 32px -12px rgba(13,148,136,0.18)" : "none",
+        transition: "background .3s var(--ease), backdrop-filter .3s var(--ease), box-shadow .3s var(--ease)",
       }}
     >
       <div className="wrap nav-bar" style={{ display: "flex", alignItems: "center", gap: 16, height: 68 }}>
@@ -61,7 +61,13 @@ export default function Navbar() {
             style={{ display: "none", width: 40, height: 40, border: "none", background: "var(--neutral-50)", borderRadius: 10, cursor: "pointer", alignItems: "center", justifyContent: "center", color: "var(--neutral-700)", flexShrink: 0 }}>
             {open ? <IconX size={20} color="currentColor" /> : <IconMenu size={20} color="currentColor" />}
           </button>
-          <Logo size={40} iconOnly />
+          <button
+            onClick={() => { router.push("/"); router.refresh(); }}
+            aria-label="หน้าแรก"
+            style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}
+          >
+            <Logo size={40} iconOnly />
+          </button>
         </div>
 
         {/* กลาง: เมนู + ช่องค้นหา */}
@@ -101,7 +107,7 @@ export default function Navbar() {
 
       {/* Mobile drawer */}
       {open && (
-        <div className="nav-drawer anim-fade-up" style={{ borderTop: "1px solid var(--neutral-100)", background: "#fff", padding: "12px 24px 18px", display: "flex", flexDirection: "column", gap: 4 }}>
+        <div className="nav-drawer anim-fade-up" style={{ borderTop: "1px solid rgba(13,148,136,0.1)", background: "rgba(255,255,255,0.88)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", padding: "12px 24px 18px", display: "flex", flexDirection: "column", gap: 4 }}>
           <form onSubmit={submitSearch} style={{ display: "flex", alignItems: "center", background: "var(--neutral-50)", border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-full)", padding: "0 6px 0 16px", height: 44, marginBottom: 8 }}>
             <input type="text" value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาสินค้า…" style={{ flex: 1, minWidth: 0, border: "none", background: "none", outline: "none", fontFamily: "var(--font-body)", fontSize: 14 }} />
             <button type="submit" aria-label="ค้นหา" style={{ width: 32, height: 32, border: "none", borderRadius: "50%", background: "var(--color-primary)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
