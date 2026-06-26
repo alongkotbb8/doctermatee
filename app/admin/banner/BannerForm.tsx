@@ -73,8 +73,18 @@ export default function BannerForm({ banner, products = [] }: { banner?: BannerD
 
   const inp = { width: "100%", height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", padding: "0 16px", fontSize: 14, fontFamily: "var(--font-body)", outline: "none", background: "#fff" } as React.CSSProperties;
   const lbl: React.CSSProperties = { display: "block", fontSize: 12, fontWeight: 600, color: "var(--neutral-600)", marginBottom: 6 };
-  const foc = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = "var(--teal-600)"; };
-  const blr = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = "var(--neutral-200)"; };
+  const foc = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const wrap = e.target.closest("[data-input-wrap]") as HTMLElement | null;
+    if (wrap) wrap.style.borderColor = "var(--teal-600)";
+    else e.target.style.borderColor = "var(--teal-600)";
+  };
+  const blr = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const wrap = e.target.closest("[data-input-wrap]") as HTMLElement | null;
+    if (wrap) wrap.style.borderColor = "var(--neutral-200)";
+    else e.target.style.borderColor = "var(--neutral-200)";
+  };
+  const inputWrap: React.CSSProperties = { display: "flex", alignItems: "center", gap: 10, height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", padding: "0 14px", background: "#fff", transition: "border-color .15s" };
+  const inpInner: React.CSSProperties = { flex: 1, border: "none", outline: "none", fontSize: 14, fontFamily: "var(--font-body)", background: "transparent", color: "var(--neutral-900)", minWidth: 0 };
 
   return (
     <div style={{ maxWidth: 940 }}>
@@ -93,39 +103,50 @@ export default function BannerForm({ banner, products = [] }: { banner?: BannerD
             <div><label style={lbl}>คำอธิบาย</label><textarea value={subtitle} onChange={(e) => setSubtitle(e.target.value)} rows={3} style={{ ...inp, height: "auto", padding: "10px 14px", resize: "vertical" }} onFocus={foc} onBlur={blr} /></div>
           </div>
 
-          <div className="card" style={{ padding: "22px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className="card" style={{ padding: "22px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
             <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "var(--neutral-800)", margin: 0 }}>ปุ่ม CTA</h2>
+
+            {/* ปุ่มหลัก */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-              <div><label style={lbl}>ปุ่มหลัก (ข้อความ)</label><input value={ctaPrimary} onChange={(e) => setCtaPrimary(e.target.value)} style={inp} onFocus={foc} onBlur={blr} /></div>
               <div>
-                <label style={lbl}>ปุ่มหลัก (ลิงก์) — เลือกสินค้าหรือพิมพ์เอง</label>
-                <div style={{ display: "flex", gap: 6 }}>
-                  <input value={ctaPrimaryHref} onChange={(e) => setCtaPrimaryHref(e.target.value)} style={{ ...inp, flex: 1 }} placeholder="/products" onFocus={foc} onBlur={blr} />
-                  {products.length > 0 && (
-                    <select onChange={(e) => { if (e.target.value) setCtaPrimaryHref(`/products/${e.target.value}`); e.target.value = ""; }}
-                      style={{ height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", padding: "0 10px", fontSize: 13, background: "#fff", cursor: "pointer", color: "var(--neutral-600)" }}>
-                      <option value="">เลือกสินค้า…</option>
-                      {products.map((p) => <option key={p.id} value={p.slug}>{p.name}</option>)}
-                    </select>
-                  )}
+                <label style={lbl}>ข้อความปุ่มหลัก</label>
+                <div style={inputWrap} data-input-wrap>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--neutral-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+                  <input value={ctaPrimary} onChange={(e) => setCtaPrimary(e.target.value)} style={inpInner} placeholder="เลือกสินค้า" onFocus={foc} onBlur={blr} />
                 </div>
               </div>
-              <div><label style={lbl}>ปุ่มรอง (ข้อความ)</label><input value={ctaSecondary} onChange={(e) => setCtaSecondary(e.target.value)} style={inp} onFocus={foc} onBlur={blr} /></div>
               <div>
-                <label style={lbl}>ปุ่มรอง (ลิงก์) — เลือกสินค้าหรือพิมพ์เอง</label>
-                <div style={{ display: "flex", gap: 6 }}>
-                  <input value={ctaSecondaryHref} onChange={(e) => setCtaSecondaryHref(e.target.value)} style={{ ...inp, flex: 1 }} placeholder="/articles" onFocus={foc} onBlur={blr} />
-                  {products.length > 0 && (
-                    <select onChange={(e) => { if (e.target.value) setCtaSecondaryHref(`/products/${e.target.value}`); e.target.value = ""; }}
-                      style={{ height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", padding: "0 10px", fontSize: 13, background: "#fff", cursor: "pointer", color: "var(--neutral-600)" }}>
-                      <option value="">เลือกสินค้า…</option>
-                      {products.map((p) => <option key={p.id} value={p.slug}>{p.name}</option>)}
-                    </select>
-                  )}
+                <label style={lbl}>ลิงก์ปุ่มหลัก</label>
+                <div style={inputWrap} data-input-wrap>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--neutral-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  <input value={ctaPrimaryHref} onChange={(e) => setCtaPrimaryHref(e.target.value)} style={inpInner} placeholder="/products" onFocus={foc} onBlur={blr} />
                 </div>
               </div>
             </div>
-            <p style={{ fontSize: 11, color: "var(--neutral-400)", margin: 0 }}>💡 ลิงก์ตัวอย่าง: <code>/products</code> · <code>/articles</code> · <code>/reviews</code> · <code>/qa</code></p>
+
+            {/* ปุ่มรอง */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              <div>
+                <label style={lbl}>ข้อความปุ่มรอง</label>
+                <div style={inputWrap} data-input-wrap>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--neutral-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+                  <input value={ctaSecondary} onChange={(e) => setCtaSecondary(e.target.value)} style={inpInner} placeholder="บทความสุขภาพ" onFocus={foc} onBlur={blr} />
+                </div>
+              </div>
+              <div>
+                <label style={lbl}>ลิงก์ปุ่มรอง</label>
+                <div style={inputWrap} data-input-wrap>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--neutral-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  <input value={ctaSecondaryHref} onChange={(e) => setCtaSecondaryHref(e.target.value)} style={inpInner} placeholder="/articles" onFocus={foc} onBlur={blr} />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {["/products", "/articles", "/reviews", "/qa"].map((hint) => (
+                <span key={hint} style={{ fontSize: 11, color: "var(--teal-600)", background: "var(--teal-50)", border: "1px solid var(--teal-100)", borderRadius: "var(--radius-full)", padding: "2px 10px", fontFamily: "monospace", cursor: "default" }}>{hint}</span>
+              ))}
+            </div>
           </div>
 
           <div className="card" style={{ padding: "20px 24px" }}>
