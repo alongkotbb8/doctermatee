@@ -43,7 +43,6 @@ export default function AboutPage() {
           </Link>
         </div>
       </div>
-      <style>{`@media(max-width:768px){div[style*="repeat(3"]{grid-template-columns:1fr!important}}`}</style>
     </div>
   );
 }

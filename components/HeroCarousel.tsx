@@ -118,14 +118,6 @@ export default function HeroCarousel({ banners }: { banners: Banner[] }) {
         </>
       )}
 
-      <style>{`
-        @keyframes heroInLeft { from { opacity: 0; transform: translateX(-48px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes heroInRight { from { opacity: 0; transform: translateX(48px); } to { opacity: 1; transform: translateX(0); } }
-        @media (prefers-reduced-motion: reduce) {
-          [style*="heroInLeft"], [style*="heroInRight"] { animation: none !important; }
-        }
-        @media (max-width: 600px){ .hero-arrow{ display:none !important } }
-      `}</style>
     </section>
   );
 }

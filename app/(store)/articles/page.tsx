@@ -82,11 +82,6 @@ export default async function ArticlesPage() {
         )}
       </div>
 
-      <style>{`
-        @media (max-width: 640px) {
-          .articles-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </div>
   );
 }

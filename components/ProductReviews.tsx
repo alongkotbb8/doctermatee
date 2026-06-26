@@ -73,10 +73,6 @@ export default async function ProductReviews({ productId }: { productId: string 
       {/* ฟอร์มเขียนรีวิว */}
       <ProductReviewForm productId={productId} />
 
-      <style>{`@media(max-width:768px){
-        .rv-top{grid-template-columns:1fr!important;gap:20px!important}
-        .rv-cards{grid-template-columns:1fr!important}
-      }`}</style>
     </section>
   );
 }

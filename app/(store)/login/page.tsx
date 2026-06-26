@@ -8,7 +8,6 @@ export default function LoginPage() {
   return (
     <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--gradient-hero)", padding: "40px 16px" }}>
       <div className="anim-pop-in auth-card" style={{ width: "100%", maxWidth: 460, background: "var(--glass-bg)", border: "1px solid var(--glass-border)", borderRadius: "var(--radius-lg)", backdropFilter: "blur(var(--glass-blur))", boxShadow: "var(--shadow-lg)", padding: "40px 40px" }}>
-      <style>{`.auth-card { padding: 40px 40px; } @media (max-width: 480px) { .auth-card { padding: 28px 20px !important; border-radius: 16px !important; } }`}</style>
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div style={{ marginBottom: 16 }}><Logo size={32} /></div>
           <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 22, color: "var(--neutral-900)", marginBottom: 6 }}>เข้าสู่ระบบ</h1>

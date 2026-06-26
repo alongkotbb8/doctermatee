@@ -125,7 +125,6 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         </div>
 
-        <style>{`.pcard-hover:hover{transform:translateY(-5px);box-shadow:var(--shadow-md);border-color:var(--teal-200)!important;transition:.25s var(--ease)}`}</style>
       </article>
     </Link>
   );

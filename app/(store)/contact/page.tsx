@@ -54,7 +54,6 @@ export default async function ContactPage() {
         <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 20, color: "var(--neutral-900)", marginBottom: 16, textAlign: "center" }}>ส่งข้อความถึงเรา</h2>
         <ContactForm />
       </div>
-      <style>{`@media(max-width:768px){div[style*="repeat(3"]{grid-template-columns:1fr!important}}`}</style>
     </div>
   );
 }

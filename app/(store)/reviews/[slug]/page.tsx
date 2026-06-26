@@ -251,13 +251,6 @@ export default async function ReviewDetailPage({ params }: Props) {
         </article>
       </div>
 
-      <style>{`
-        .rv-table th, .rv-table td { white-space: nowrap; }
-        .rv-faq summary::-webkit-details-marker { display: none; }
-        .rv-faq[open] .rv-faq-icon { transform: rotate(45deg); }
-        .rv-faq-icon { transition: transform .2s; display: inline-block; }
-        @media(max-width:640px){ .rv-proscons{ grid-template-columns: 1fr !important; } }
-      `}</style>
     </>
   );
 }

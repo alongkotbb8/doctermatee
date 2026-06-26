@@ -166,19 +166,6 @@ export default async function ArticlePage({ params }: Props) {
         </div>
       </div>
 
-      <style>{`
-        .article-body { font-size: 16px; line-height: 1.9; color: var(--neutral-700); }
-        .article-body h2 { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: var(--neutral-900); margin: 36px 0 14px; }
-        .article-body h3 { font-family: var(--font-display); font-weight: 600; font-size: 18px; color: var(--neutral-800); margin: 28px 0 10px; }
-        .article-body p { margin: 0 0 18px; }
-        .article-body ul, .article-body ol { padding-left: 24px; margin: 0 0 18px; }
-        .article-body li { margin-bottom: 6px; }
-        .article-body strong { color: var(--neutral-900); font-weight: 700; }
-        .article-body a { color: var(--teal-600); text-decoration: underline; }
-        .article-body img { max-width: 100%; border-radius: 10px; margin: 16px 0; }
-        .article-body blockquote { border-left: 4px solid var(--teal-400); padding: 12px 20px; margin: 24px 0; background: var(--teal-50); border-radius: 0 8px 8px 0; color: var(--neutral-700); font-style: italic; }
-        @media(max-width:768px){ .article-body{font-size:15px} div[style*="repeat(3"]{grid-template-columns:1fr!important} }
-      `}</style>
     </>
   );
 }

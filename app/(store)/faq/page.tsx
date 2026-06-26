@@ -36,7 +36,6 @@ export default function FaqPage() {
           ))}
         </div>
       </div>
-      <style>{`details summary::-webkit-details-marker{display:none}`}</style>
     </div>
   );
 }
