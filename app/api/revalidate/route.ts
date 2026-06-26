@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   } catch { /* ใช้ default */ }
 
   // ล้าง Data Cache
-  tags.forEach((t) => revalidateTag(t));
+  tags.forEach((t) => revalidateTag(t, { expire: 0 }));
 
   // ล้าง Full Route Cache ของหน้าที่เกี่ยวข้อง
   if (tags.includes("articles"))  revalidatePath("/articles", "layout");

@@ -32,6 +32,6 @@ export async function POST(req: NextRequest) {
   });
   if (error) return NextResponse.json({ error: "ส่งคำถามไม่สำเร็จ กรุณาลองใหม่" }, { status: 500 });
 
-  revalidateTag("qa");
+  revalidateTag("qa", { expire: 0 });
   return NextResponse.json({ ok: true });
 }
