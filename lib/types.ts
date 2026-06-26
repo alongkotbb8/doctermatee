@@ -17,6 +17,8 @@ export interface Product {
   stock: number;
   status: "active" | "draft";
   images: string[];
+  is_featured: boolean;
+  is_new: boolean;
   created_at: string;
   categories?: Category | null;
 }

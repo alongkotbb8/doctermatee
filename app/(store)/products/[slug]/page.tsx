@@ -5,7 +5,8 @@ import AddToCartButton from "@/components/AddToCartButton";
 import BuyNowButton from "@/components/BuyNowButton";
 import ProductReviews from "@/components/ProductReviews";
 import { getProductRating } from "@/lib/productReviews";
-import { jsonLd } from "@/lib/jsonld";
+import Image from "next/image";
+import { jsonLd, breadcrumbLd } from "@/lib/jsonld";
 import { IconPill, IconFlask, IconSparkles, IconBaby, IconHeartPulse, IconLeaf, IconTruck } from "@/components/icons";
 import type { Metadata } from "next";
 
@@ -19,8 +20,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const products = await getActiveProducts();
   const data = products.find((p) => p.slug === slug);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://doctermatee.co.th";
   if (!data) return { title: "ไม่พบสินค้า" };
-  return { title: data.name, description: data.description ?? undefined };
+  return {
+    title: data.name,
+    description: data.description ?? undefined,
+    alternates: { canonical: `${siteUrl}/products/${slug}` },
+    openGraph: {
+      title: data.name,
+      description: data.description ?? undefined,
+      type: "website",
+      images: data.images?.length ? [data.images[0]] : [],
+    },
+  };
 }
 
 const CAT_ICONS: Record<string, React.ReactNode> = {
@@ -50,6 +62,12 @@ export default async function ProductDetailPage({ params }: Props) {
   const { avg, total } = await getProductRating(product.id);
 
   // Product (Schema.org) — ให้ AI/Google เข้าใจสินค้า; ใส่ aggregateRating เฉพาะเมื่อมีรีวิวจริง
+  const breadcrumb = breadcrumbLd(siteUrl, [
+    { name: "หน้าแรก", url: "/" },
+    { name: "สินค้า", url: "/products" },
+    { name: product.name, url: `/products/${slug}` },
+  ]);
+
   const productLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -80,7 +98,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
   return (
     <div style={{ padding: "32px 0 64px" }}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(productLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd([productLd, breadcrumb]) }} />
       <div className="wrap">
         {/* Breadcrumb */}
         <nav style={{ fontSize: 13, color: "var(--neutral-500)", marginBottom: 24, display: "flex", gap: 8, alignItems: "center" }}>
@@ -93,10 +111,16 @@ export default async function ProductDetailPage({ params }: Props) {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}>
           {/* Image */}
-          <div style={{ background: "var(--green-50)", borderRadius: "var(--radius-lg)", height: 420, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--neutral-200)" }}>
+          <div style={{ background: "var(--green-50)", borderRadius: "var(--radius-lg)", height: 420, position: "relative", overflow: "hidden", border: "1px solid var(--neutral-200)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             {product.images[0] ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={product.images[0]} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "var(--radius-lg)" }} />
+              <Image
+                src={product.images[0]}
+                alt={product.name}
+                fill
+                style={{ objectFit: "cover", borderRadius: "var(--radius-lg)" }}
+                sizes="(max-width:768px) 100vw, 50vw"
+                priority
+              />
             ) : (
               <span style={{ opacity: 0.8 }}>{icon}</span>
             )}

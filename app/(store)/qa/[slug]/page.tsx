@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getQuestion, getApprovedQuestions, type QAAnswer } from "@/lib/qa";
-import { jsonLd } from "@/lib/jsonld";
+import { jsonLd, breadcrumbLd } from "@/lib/jsonld";
 import AnswerForm from "@/components/AnswerForm";
 import { IconArrowRight, IconStethoscope, IconUser, IconShield } from "@/components/icons";
 
@@ -66,7 +66,11 @@ export default async function QuestionPage({ params }: Props) {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(qaLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd([qaLd, breadcrumbLd(siteUrl, [
+        { name: "หน้าแรก", url: "/" },
+        { name: "ถาม-ตอบ", url: "/qa" },
+        { name: q.title, url: `/qa/${slug}` },
+      ])]) }} />
 
       <div style={{ padding: "40px 0 80px" }}>
         <div style={{ maxWidth: 800, margin: "0 auto", padding: "0 24px" }}>

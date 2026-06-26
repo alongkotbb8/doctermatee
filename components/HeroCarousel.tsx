@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { IconLeaf, IconShield, IconTag, IconPill } from "./icons";
 import type { Banner } from "@/lib/data";
@@ -81,8 +82,7 @@ export default function HeroCarousel({ banners }: { banners: Banner[] }) {
         {/* Right visual */}
         <div className="col-5" key={`vis-${i}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 340, position: "relative", animation: "heroInRight .95s cubic-bezier(.22,.61,.36,1) both" }}>
           {b.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={b.image} alt={b.title ?? "banner"} style={{ width: "100%", maxHeight: 380, objectFit: "contain", borderRadius: "var(--radius-lg)" }} />
+            <Image src={b.image} alt={b.title ?? "banner"} width={600} height={380} style={{ width: "100%", maxHeight: 380, objectFit: "contain", borderRadius: "var(--radius-lg)" }} priority />
           ) : (
             <BottleMock />
           )}

@@ -7,8 +7,9 @@ import { IconArrowRight, IconClock } from "@/components/icons";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "บทความสุขภาพ",
-  description: "บทความและความรู้ด้านสุขภาพ วิตามิน อาหารเสริม จากผู้เชี่ยวชาญ",
+  title: "บทความสุขภาพและอาหารเสริม",
+  description: "บทความความรู้ด้านสุขภาพ วิตามิน อาหารเสริม คอลลาเจน น้ำมันปลา เขียนโดยเภสัชกรและผู้เชี่ยวชาญ อ่านฟรี อัปเดตทุกสัปดาห์ | Doctermatee",
+  alternates: { canonical: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://doctermatee.co.th"}/articles` },
 };
 
 type Art = HomeArticle;

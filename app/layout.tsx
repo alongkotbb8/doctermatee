@@ -30,7 +30,6 @@ export const metadata: Metadata = {
     images: [{ url: "/OG.png", width: 750, height: 750, alt: "Doctermatee" }],
   },
   twitter: { card: "summary_large_image", images: ["/OG.png"] },
-  alternates: { canonical: siteUrl },
 };
 
 export default function RootLayout({

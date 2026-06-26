@@ -105,8 +105,7 @@ export default async function HomePage() {
             {/* Right — image or bottle */}
             <div className="col-5 anim-fade-in d2" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 340, position: "relative" }}>
               {heroImg ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={heroImg} alt="Hero" style={{ width: "100%", maxHeight: 380, objectFit: "contain", borderRadius: "var(--radius-lg)" }} />
+                <Image src={heroImg} alt="Hero" width={600} height={380} style={{ width: "100%", maxHeight: 380, objectFit: "contain", borderRadius: "var(--radius-lg)" }} priority />
               ) : (
                 <div className="anim-float" style={{ position: "relative", width: 200 }}>
                   <div style={{ width: 118, height: 42, background: "var(--teal-800)", borderRadius: "12px 12px 6px 6px", margin: "0 auto", zIndex: 2, position: "relative" }} />

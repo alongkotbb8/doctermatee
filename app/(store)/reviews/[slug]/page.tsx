@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getReview, getAllReviews } from "@/lib/reviews";
-import { jsonLd } from "@/lib/jsonld";
+import { jsonLd, breadcrumbLd } from "@/lib/jsonld";
 import Stars from "@/components/Stars";
 import { IconArrowRight, IconCheck, IconX, IconShield, IconClock, IconUser } from "@/components/icons";
 
@@ -83,7 +83,11 @@ export default async function ReviewDetailPage({ params }: Props) {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd([faqLd, productLd, articleLd]) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd([faqLd, productLd, articleLd, breadcrumbLd(siteUrl, [
+        { name: "หน้าแรก", url: "/" },
+        { name: "รีวิว & เปรียบเทียบ", url: "/reviews" },
+        { name: r.question, url: `/reviews/${slug}` },
+      ])]) }} />
 
       <div style={{ padding: "40px 0 80px" }}>
         <article style={{ maxWidth: 800, margin: "0 auto", padding: "0 24px" }}>

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { IconClock, IconArrowRight } from "@/components/icons";
-import { jsonLd } from "@/lib/jsonld";
+import { jsonLd, breadcrumbLd } from "@/lib/jsonld";
 
 export const revalidate = 60;
 
@@ -14,11 +14,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const supabase = createServiceClient();
   const { data } = await supabase.from("articles").select("title, excerpt, cover_image").eq("slug", slug).single();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://doctermatee.co.th";
   if (!data) return { title: "ไม่พบบทความ" };
   return {
     title: data.title,
     description: data.excerpt ?? undefined,
-    openGraph: { title: data.title, description: data.excerpt ?? undefined, images: data.cover_image ? [data.cover_image] : [] },
+    alternates: { canonical: `${siteUrl}/articles/${slug}` },
+    openGraph: { title: data.title, description: data.excerpt ?? undefined, type: "article", images: data.cover_image ? [data.cover_image] : [] },
   };
 }
 
@@ -72,7 +74,12 @@ export default async function ArticlePage({ params }: Props) {
         mainEntity: faqItems.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
       }
     : null;
-  const ld = faqLd ? [articleLd, faqLd] : articleLd;
+  const breadcrumb = breadcrumbLd(siteUrl, [
+    { name: "หน้าแรก", url: "/" },
+    { name: "บทความ", url: "/articles" },
+    { name: article.title, url: `/articles/${slug}` },
+  ]);
+  const ld = faqLd ? [articleLd, faqLd, breadcrumb] : [articleLd, breadcrumb];
 
   return (
     <>

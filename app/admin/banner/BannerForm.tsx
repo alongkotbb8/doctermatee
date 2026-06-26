@@ -14,11 +14,13 @@ export interface BannerData {
   is_active: boolean; sort_order: number;
 }
 
+export interface BannerProduct { id: string; name: string; slug: string }
+
 async function revalidate() {
   await fetch("/api/revalidate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tags: ["banners"] }) }).catch(() => {});
 }
 
-export default function BannerForm({ banner }: { banner?: BannerData }) {
+export default function BannerForm({ banner, products = [] }: { banner?: BannerData; products?: BannerProduct[] }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const isEdit = !!banner?.id;
@@ -91,11 +93,39 @@ export default function BannerForm({ banner }: { banner?: BannerData }) {
             <div><label style={lbl}>คำอธิบาย</label><textarea value={subtitle} onChange={(e) => setSubtitle(e.target.value)} rows={3} style={{ ...inp, height: "auto", padding: "10px 14px", resize: "vertical" }} onFocus={foc} onBlur={blr} /></div>
           </div>
 
-          <div className="card" style={{ padding: "22px 24px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-            <div><label style={lbl}>ปุ่มหลัก (ข้อความ)</label><input value={ctaPrimary} onChange={(e) => setCtaPrimary(e.target.value)} style={inp} onFocus={foc} onBlur={blr} /></div>
-            <div><label style={lbl}>ปุ่มหลัก (ลิงก์)</label><input value={ctaPrimaryHref} onChange={(e) => setCtaPrimaryHref(e.target.value)} style={inp} placeholder="/products" onFocus={foc} onBlur={blr} /></div>
-            <div><label style={lbl}>ปุ่มรอง (ข้อความ)</label><input value={ctaSecondary} onChange={(e) => setCtaSecondary(e.target.value)} style={inp} onFocus={foc} onBlur={blr} /></div>
-            <div><label style={lbl}>ปุ่มรอง (ลิงก์)</label><input value={ctaSecondaryHref} onChange={(e) => setCtaSecondaryHref(e.target.value)} style={inp} placeholder="/articles" onFocus={foc} onBlur={blr} /></div>
+          <div className="card" style={{ padding: "22px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
+            <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "var(--neutral-800)", margin: 0 }}>ปุ่ม CTA</h2>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+              <div><label style={lbl}>ปุ่มหลัก (ข้อความ)</label><input value={ctaPrimary} onChange={(e) => setCtaPrimary(e.target.value)} style={inp} onFocus={foc} onBlur={blr} /></div>
+              <div>
+                <label style={lbl}>ปุ่มหลัก (ลิงก์) — เลือกสินค้าหรือพิมพ์เอง</label>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <input value={ctaPrimaryHref} onChange={(e) => setCtaPrimaryHref(e.target.value)} style={{ ...inp, flex: 1 }} placeholder="/products" onFocus={foc} onBlur={blr} />
+                  {products.length > 0 && (
+                    <select onChange={(e) => { if (e.target.value) setCtaPrimaryHref(`/products/${e.target.value}`); e.target.value = ""; }}
+                      style={{ height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", padding: "0 10px", fontSize: 13, background: "#fff", cursor: "pointer", color: "var(--neutral-600)" }}>
+                      <option value="">เลือกสินค้า…</option>
+                      {products.map((p) => <option key={p.id} value={p.slug}>{p.name}</option>)}
+                    </select>
+                  )}
+                </div>
+              </div>
+              <div><label style={lbl}>ปุ่มรอง (ข้อความ)</label><input value={ctaSecondary} onChange={(e) => setCtaSecondary(e.target.value)} style={inp} onFocus={foc} onBlur={blr} /></div>
+              <div>
+                <label style={lbl}>ปุ่มรอง (ลิงก์) — เลือกสินค้าหรือพิมพ์เอง</label>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <input value={ctaSecondaryHref} onChange={(e) => setCtaSecondaryHref(e.target.value)} style={{ ...inp, flex: 1 }} placeholder="/articles" onFocus={foc} onBlur={blr} />
+                  {products.length > 0 && (
+                    <select onChange={(e) => { if (e.target.value) setCtaSecondaryHref(`/products/${e.target.value}`); e.target.value = ""; }}
+                      style={{ height: 44, border: "1px solid var(--neutral-200)", borderRadius: "var(--radius-input)", padding: "0 10px", fontSize: 13, background: "#fff", cursor: "pointer", color: "var(--neutral-600)" }}>
+                      <option value="">เลือกสินค้า…</option>
+                      {products.map((p) => <option key={p.id} value={p.slug}>{p.name}</option>)}
+                    </select>
+                  )}
+                </div>
+              </div>
+            </div>
+            <p style={{ fontSize: 11, color: "var(--neutral-400)", margin: 0 }}>💡 ลิงก์ตัวอย่าง: <code>/products</code> · <code>/articles</code> · <code>/reviews</code> · <code>/qa</code></p>
           </div>
 
           <div className="card" style={{ padding: "20px 24px" }}>

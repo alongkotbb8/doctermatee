@@ -2,6 +2,15 @@ import Link from "next/link";
 import { getActiveProducts, getCategories } from "@/lib/data";
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/lib/types";
+import type { Metadata } from "next";
+
+export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: "สินค้าอาหารเสริมและวิตามิน",
+  description: "เลือกซื้ออาหารเสริม วิตามิน และผลิตภัณฑ์ดูแลสุขภาพคุณภาพสูง คัดสรรโดยผู้เชี่ยวชาญ จัดส่งฟรีเมื่อซื้อครบ ฿500 | Doctermatee",
+  alternates: { canonical: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://doctermatee.co.th"}/products` },
+};
 
 interface Props {
   searchParams: Promise<{ category?: string; q?: string }>;

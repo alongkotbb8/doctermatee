@@ -19,6 +19,8 @@ interface ProductData {
   fda_no: string;
   status: "active" | "draft";
   images: string[] | null;
+  is_featured?: boolean;
+  is_new?: boolean;
 }
 
 interface Props {
@@ -44,6 +46,8 @@ export default function ProductForm({ categories, product }: Props) {
   const [categoryId, setCategoryId] = useState(product?.category_id ?? categories[0]?.id ?? "");
   const [fdaNo, setFdaNo] = useState(product?.fda_no ?? "");
   const [isActive, setIsActive] = useState((product?.status ?? "active") === "active");
+  const [isFeatured, setIsFeatured] = useState(product?.is_featured ?? false);
+  const [isNew, setIsNew] = useState(product?.is_new ?? false);
   const [imageUrl, setImageUrl] = useState(product?.images?.[0] ?? null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -75,6 +79,8 @@ export default function ProductForm({ categories, product }: Props) {
       fda_no: fdaNo,
       status: isActive ? "active" : "draft",
       images: imageUrl ? [imageUrl] : [],
+      is_featured: isFeatured,
+      is_new: isNew,
     };
     if (isEdit) {
       const { error: e } = await supabase.from("products").update(payload).eq("id", product!.id!);
@@ -197,10 +203,14 @@ export default function ProductForm({ categories, product }: Props) {
           <div className="card" style={{ padding: "20px", display: "flex", flexDirection: "column", gap: 14 }}>
             <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "var(--neutral-800)", margin: 0 }}>การแสดงผล</h2>
             {[
-              { label: "เผยแพร่", value: isActive, set: setIsActive },
-            ].map(({ label, value, set }) => (
-              <label key={label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
-                <span style={{ fontSize: 14, color: "var(--neutral-700)" }}>{label}</span>
+              { label: "เผยแพร่", sub: "แสดงในร้าน", value: isActive, set: setIsActive },
+              { label: "⭐ สินค้าแนะนำ (หน้าแรก)", sub: "แสดงในช่องสินค้าแนะนำ", value: isFeatured, set: setIsFeatured },
+              { label: "🆕 สินค้าใหม่", sub: "ติดแท็กสินค้าใหม่บน card", value: isNew, set: setIsNew },
+            ].map(({ label, sub, value, set }) => (
+              <label key={label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", gap: 12 }}>
+                <span style={{ fontSize: 13, color: "var(--neutral-700)", lineHeight: 1.4 }}>
+                  {label}<br /><span style={{ fontSize: 11, color: "var(--neutral-400)" }}>{sub}</span>
+                </span>
                 <div onClick={() => set(!value)} style={{ width: 44, height: 24, borderRadius: 12, background: value ? "var(--teal-500)" : "var(--neutral-200)", position: "relative", transition: "background .2s", cursor: "pointer", flexShrink: 0 }}>
                   <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#fff", position: "absolute", top: 3, left: value ? 22 : 3, transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,.2)" }} />
                 </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { IconFlask, IconPill, IconSparkles, IconBaby, IconHeartPulse, IconStar } from "./icons";
 import AddToCartButton from "./AddToCartButton";
@@ -33,7 +34,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
   const catSlug = product.categories?.slug ?? "";
   const icon = CAT_ICONS[catSlug] ?? <IconPill size={52} color="var(--teal-500)" />;
-  const isNew = new Date(product.created_at) > new Date(Date.now() - 30 * 86400000);
+  const isNew = product.is_new ?? new Date(product.created_at) > new Date(Date.now() - 30 * 86400000);
   const reviews = reviewCount(product.id);
   const soldOut = product.stock <= 0;
 
@@ -55,8 +56,7 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* Image */}
         <div style={{ position: "relative", height: 210, background: "linear-gradient(145deg, var(--green-50), var(--teal-50))", display: "flex", alignItems: "center", justifyContent: "center" }}>
           {product.images[0] ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={product.images[0]} alt={product.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <Image src={product.images[0]} alt={product.name} fill style={{ objectFit: "cover" }} sizes="(max-width:768px) 50vw, 25vw" />
           ) : (
             <div style={{ opacity: 0.7 }}>{icon}</div>
           )}
