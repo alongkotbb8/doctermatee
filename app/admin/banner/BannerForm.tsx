@@ -9,6 +9,7 @@ import Image from "next/image";
 export interface BannerData {
   id?: string;
   title: string; accent: string; subtitle: string; image: string | null;
+  bg_image: string | null;
   cta_primary: string; cta_primary_href: string;
   cta_secondary: string; cta_secondary_href: string;
   is_active: boolean; sort_order: number;
@@ -33,10 +34,13 @@ export default function BannerForm({ banner, products = [] }: { banner?: BannerD
   const [ctaSecondary, setCtaSecondary] = useState(banner?.cta_secondary ?? "บทความสุขภาพ");
   const [ctaSecondaryHref, setCtaSecondaryHref] = useState(banner?.cta_secondary_href ?? "/articles");
   const [image, setImage] = useState(banner?.image ?? "");
+  const [bgImage, setBgImage] = useState(banner?.bg_image ?? "");
   const [isActive, setIsActive] = useState(banner?.is_active ?? true);
   const [sortOrder, setSortOrder] = useState(String(banner?.sort_order ?? 0));
 
+  const bgFileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadingBg, setUploadingBg] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
@@ -53,6 +57,18 @@ export default function BannerForm({ banner, products = [] }: { banner?: BannerD
     setUploading(false);
   }
 
+  async function uploadBg(file: File) {
+    setUploadingBg(true); setError("");
+    const supabase = createClient();
+    const ext = file.name.split(".").pop();
+    const path = `banners/bg-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from("product-images").upload(path, file, { upsert: true });
+    if (upErr) { setError("อัปโหลดภาพพื้นหลังไม่สำเร็จ"); setUploadingBg(false); return; }
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    setBgImage(data.publicUrl);
+    setUploadingBg(false);
+  }
+
   async function save() {
     setSaving(true); setError("");
     const supabase = createClient();
@@ -61,6 +77,7 @@ export default function BannerForm({ banner, products = [] }: { banner?: BannerD
       cta_primary: ctaPrimary, cta_primary_href: ctaPrimaryHref,
       cta_secondary: ctaSecondary, cta_secondary_href: ctaSecondaryHref,
       is_active: isActive, sort_order: parseInt(sortOrder) || 0,
+      bg_image: bgImage || null,
     };
     const { error: e } = isEdit
       ? await supabase.from("banners").update(payload).eq("id", banner!.id!)
@@ -147,6 +164,27 @@ export default function BannerForm({ banner, products = [] }: { banner?: BannerD
                 <span key={hint} style={{ fontSize: 11, color: "var(--teal-600)", background: "var(--teal-50)", border: "1px solid var(--teal-100)", borderRadius: "var(--radius-full)", padding: "2px 10px", fontFamily: "monospace", cursor: "default" }}>{hint}</span>
               ))}
             </div>
+          </div>
+
+          <div className="card" style={{ padding: "20px 24px" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
+              <div>
+                <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, color: "var(--neutral-800)", margin: "0 0 4px" }}>ภาพพื้นหลัง Hero (Layer ล่างสุด)</h2>
+                <p style={{ fontSize: 11, color: "var(--neutral-400)", margin: 0 }}>แนะนำ 1920×600px · JPG/WebP · ไม่เกิน 300 KB</p>
+              </div>
+            </div>
+            <input ref={bgFileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadBg(f); }} />
+            {bgImage ? (
+              <div style={{ position: "relative" }}>
+                <Image src={bgImage} alt="bg" width={520} height={180} style={{ width: "100%", height: 150, objectFit: "cover", borderRadius: 10, display: "block" }} />
+                <button onClick={() => setBgImage("")} style={{ position: "absolute", top: 8, right: 8, background: "#fff", border: "none", borderRadius: "50%", width: 30, height: 30, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,.15)" }}><IconTrash size={14} color="#EF4444" /></button>
+              </div>
+            ) : (
+              <button onClick={() => bgFileRef.current?.click()} disabled={uploadingBg} style={{ width: "100%", height: 120, border: "2px dashed var(--neutral-200)", borderRadius: 10, background: "var(--neutral-50)", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, color: "var(--neutral-400)" }}>
+                {uploadingBg ? <IconImage size={26} color="var(--teal-400)" /> : <IconUpload size={26} color="currentColor" />}
+                <span style={{ fontSize: 13 }}>{uploadingBg ? "กำลังอัปโหลด…" : "คลิกเพื่ออัปโหลดภาพพื้นหลัง (ไม่ใส่ = ไล่สีเขียวปกติ)"}</span>
+              </button>
+            )}
           </div>
 
           <div className="card" style={{ padding: "20px 24px" }}>

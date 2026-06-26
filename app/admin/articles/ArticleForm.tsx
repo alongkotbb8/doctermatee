@@ -24,7 +24,7 @@ interface Props { article?: ArticleData }
 
 function toSlug(str: string) {
   return str.toLowerCase()
-    .replace(/[^฀-๿a-z0-9\s-]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")   // ASCII เท่านั้น — ไม่ให้ภาษาไทยใน URL
     .replace(/\s+/g, "-").replace(/-+/g, "-").trim();
 }
 

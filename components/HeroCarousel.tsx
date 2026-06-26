@@ -49,7 +49,17 @@ export default function HeroCarousel({ banners }: { banners: Banner[] }) {
       onMouseEnter={() => { pausedRef.current = true; }}
       onMouseLeave={() => { pausedRef.current = false; }}
     >
-      <div className="wrap grid-12" style={{ alignItems: "center", gap: 48, paddingTop: 60, paddingBottom: len > 1 ? 80 : 68 }}>
+      {b.bg_image && (
+        <Image
+          src={b.bg_image}
+          alt=""
+          fill
+          priority
+          style={{ objectFit: "cover", opacity: 0.18, zIndex: 0 }}
+          sizes="100vw"
+        />
+      )}
+      <div className="wrap grid-12" style={{ alignItems: "center", gap: 48, paddingTop: 60, paddingBottom: len > 1 ? 80 : 68, position: "relative", zIndex: 1 }}>
         {/* Left copy */}
         <div className="col-7" key={`copy-${i}`} style={{ animation: "heroInLeft 1.1s cubic-bezier(.22,.61,.36,1) both" }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#fff", color: "var(--teal-700)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 12, padding: "6px 14px", borderRadius: "var(--radius-full)", boxShadow: "var(--shadow-sm)", marginBottom: 20 }}>
