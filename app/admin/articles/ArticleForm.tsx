@@ -140,7 +140,7 @@ export default function ArticleForm({ article }: Props) {
             </div>
             <div>
               <label style={lbl}>Slug (URL) *</label>
-              <input value={slug} onChange={(e) => setSlug(e.target.value)} onBlur={(e) => { setSlug(toSlug(e.target.value)); blr(e); }} style={inp} placeholder="5-vitamins-daily" onFocus={foc} />
+              <input value={slug} onChange={(e) => setSlug(e.target.value)} onBlur={(e) => { setSlug(e.target.value.trim().toLowerCase().replace(/\s+/g, "-").replace(/-+/g, "-")); blr(e); }} style={inp} placeholder="5-vitamins-daily" onFocus={foc} />
             </div>
             <div>
               <label style={lbl}>บทคัดย่อ</label>
