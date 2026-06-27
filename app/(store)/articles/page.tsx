@@ -1,7 +1,6 @@
 import { getPublishedArticles, type HomeArticle } from "@/lib/data";
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { IconArrowRight, IconClock } from "@/components/icons";
 
 export const revalidate = 0;
@@ -32,16 +31,17 @@ export default async function ArticlesPage() {
         ) : (
           <>
             {/* 2-column card grid */}
-            <div className="articles-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 28 }}>
+            <div className="articles-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 28, alignItems: "start" }}>
               {articles.map((a, i) => (
                 <Link key={a.id} href={`/articles/${a.slug}`} className={`anim-fade-up d${Math.min(i + 1, 5)}`} style={{ textDecoration: "none" }}>
-                  <article className="card pcard-hover" style={{ overflow: "hidden", display: "flex", flexDirection: "column", height: "100%" }}>
-                    {/* Cover image */}
-                    <div style={{ aspectRatio: "16/9", background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", position: "relative", flexShrink: 0 }}>
+                  <article className="card pcard-hover" style={{ overflow: "hidden", display: "block" }}>
+                    {/* Cover image — สเกลจริง ไม่ครอป */}
+                    <div style={{ position: "relative", lineHeight: 0 }}>
                       {a.cover_image ? (
-                        <Image src={a.cover_image} alt={a.title} fill style={{ objectFit: "cover" }} sizes="(max-width:768px) 100vw, 50vw" priority={i < 2} />
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={a.cover_image} alt={a.title} loading={i < 2 ? "eager" : "lazy"} style={{ width: "100%", height: "auto", display: "block" }} />
                       ) : (
-                        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--teal-300)" }}>
+                        <div style={{ aspectRatio: "16/9", background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--teal-300)" }}>
                           <IconClock size={48} color="currentColor" />
                         </div>
                       )}
@@ -53,7 +53,7 @@ export default async function ArticlesPage() {
                     </div>
 
                     {/* Text */}
-                    <div style={{ padding: "20px 22px", flex: 1, display: "flex", flexDirection: "column", gap: 10 }}>
+                    <div style={{ padding: "20px 22px", display: "flex", flexDirection: "column", gap: 10 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--neutral-400)" }}>
                         <IconClock size={12} color="currentColor" />
                         <span>{a.read_time_min ?? 5} นาที</span>

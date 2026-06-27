@@ -208,27 +208,28 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            {/* การ์ดภาพเต็ม แถวเดียว สอดคล้องกับหน้า /articles */}
-            <div className="home-articles-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24 }}>
+            {/* การ์ดภาพสเกลจริง ไม่ครอป — สูงตามเนื้อหาแต่ละใบ */}
+            <div className="home-articles-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24, alignItems: "start" }}>
               {articles.map((a, i) => (
                 <Link key={a.id} href={`/articles/${a.slug}`} className={`anim-fade-up d${Math.min(i + 1, 5)}`} style={{ textDecoration: "none" }}>
-                  <article className="card pcard-hover" style={{ overflow: "hidden", display: "flex", flexDirection: "column", height: "100%" }}>
-                    <div style={{ aspectRatio: "16/9", background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", position: "relative", flexShrink: 0 }}>
+                  <article className="card pcard-hover" style={{ overflow: "hidden", display: "block" }}>
+                    <div style={{ position: "relative", lineHeight: 0 }}>
                       {a.cover_image ? (
-                        <Image src={a.cover_image} alt={a.title} fill style={{ objectFit: "cover" }} sizes="(max-width:768px) 80vw, 25vw" />
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={a.cover_image} alt={a.title} loading="lazy" style={{ width: "100%", height: "auto", display: "block" }} />
                       ) : (
-                        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><IconFlask size={44} color="var(--teal-300)" /></div>
+                        <div style={{ aspectRatio: "16/9", background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", display: "flex", alignItems: "center", justifyContent: "center" }}><IconFlask size={44} color="var(--teal-300)" /></div>
                       )}
                       {i === 0 && (
                         <span style={{ position: "absolute", top: 12, left: 12, background: "var(--teal-600)", color: "#fff", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 11, padding: "4px 12px", borderRadius: "var(--radius-full)" }}>★ บทความแนะนำ</span>
                       )}
                     </div>
-                    <div style={{ padding: "16px 18px", flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ padding: "16px 18px", display: "flex", flexDirection: "column", gap: 8 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--neutral-400)", fontSize: 12 }}>
                         <IconClock size={12} color="currentColor" /> {a.read_time_min ?? 5} นาที
                       </div>
                       <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, lineHeight: 1.4, color: "var(--neutral-900)", margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{a.title}</h3>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "var(--teal-600)", fontSize: 13, fontWeight: 600, marginTop: "auto" }}>อ่านบทความ <IconArrowRight size={13} color="var(--teal-600)" /></span>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "var(--teal-600)", fontSize: 13, fontWeight: 600 }}>อ่านบทความ <IconArrowRight size={13} color="var(--teal-600)" /></span>
                     </div>
                   </article>
                 </Link>
