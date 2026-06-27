@@ -215,12 +215,12 @@ export default async function HomePage() {
               {/* เด่นซ้าย */}
               <Link href={`/articles/${pinnedArticle.slug}`} className="anim-fade-up" style={{ textDecoration: "none" }}>
                 <article className="card pcard-hover" style={{ overflow: "hidden", display: "block" }}>
-                  <div style={{ position: "relative", lineHeight: 0 }}>
+                  <div style={{ position: "relative", lineHeight: 0, display: "flex", justifyContent: "center", background: "var(--neutral-50)" }}>
                     {pinnedArticle.cover_image ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={pinnedArticle.cover_image} alt={pinnedArticle.title} style={{ width: "100%", height: "auto", display: "block" }} />
+                      <img src={pinnedArticle.cover_image} alt={pinnedArticle.title} style={{ maxWidth: "100%", maxHeight: 440, width: "auto", height: "auto", display: "block" }} />
                     ) : (
-                      <div style={{ aspectRatio: "16/9", background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", display: "flex", alignItems: "center", justifyContent: "center" }}><IconFlask size={64} color="var(--teal-300)" /></div>
+                      <div style={{ width: "100%", aspectRatio: "16/9", background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", display: "flex", alignItems: "center", justifyContent: "center" }}><IconFlask size={64} color="var(--teal-300)" /></div>
                     )}
                     <span style={{ position: "absolute", top: 16, left: 16, background: "var(--glass-bg)", border: "1px solid var(--glass-border)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", color: "var(--teal-800)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 12, padding: "7px 14px", borderRadius: "var(--radius-full)", boxShadow: "var(--shadow-md)", display: "inline-flex", alignItems: "center", gap: 5 }}><IconStar size={13} color="var(--teal-600)" /> บทความแนะนำ</span>
                   </div>
