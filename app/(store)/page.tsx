@@ -40,9 +40,9 @@ export default async function HomePage() {
   ]);
 
   const rawProducts = allProducts.slice(0, 9);
-  const articles: HomeArticle[] = allArticles.slice(0, 3);
+  const articles: HomeArticle[] = allArticles.slice(0, 4);
   const pinnedArticle = articles[0];
-  const otherArticles = articles.slice(1, 3);
+  const otherArticles = articles.slice(1, 4);
 
   const config = (settings.homepage_config ?? {}) as HomepageConfig;
   // hero ทั้งหมด (ข้อความ + รูป) อ่านจาก site_settings key="hero" เพื่อให้หน้า "แบนเนอร์" หลังบ้านคุมได้
@@ -236,23 +236,23 @@ export default async function HomePage() {
                 </article>
               </Link>
 
-              {/* รายการขวา — ภาพซ้าย ข้อความขวา ยืดเต็มความสูง section */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              {/* รายการขวา 3 ใบ — ภาพซ้าย ข้อความขวา ยืดเต็มความสูง section */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 {otherArticles.map((a, i) => (
                   <Link key={a.id} href={`/articles/${a.slug}`} className={`anim-fade-up d${Math.min(i + 2, 5)}`} style={{ textDecoration: "none", flex: 1, display: "block" }}>
-                    <article className="card pcard-hover" style={{ display: "flex", alignItems: "center", gap: 18, padding: 16, height: "100%" }}>
-                      <div style={{ width: "42%", flexShrink: 0, borderRadius: 12, overflow: "hidden", background: "var(--neutral-50)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <article className="card pcard-hover" style={{ display: "flex", alignItems: "center", gap: 16, padding: 14, height: "100%" }}>
+                      <div style={{ width: "40%", flexShrink: 0, borderRadius: 12, overflow: "hidden", background: "var(--neutral-50)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                         {a.cover_image ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={a.cover_image} alt={a.title} loading="lazy" style={{ width: "100%", height: "auto", display: "block" }} />
                         ) : (
-                          <div style={{ width: "100%", aspectRatio: "16/9", display: "flex", alignItems: "center", justifyContent: "center" }}><IconPill size={32} color="var(--teal-300)" /></div>
+                          <div style={{ width: "100%", aspectRatio: "16/9", display: "flex", alignItems: "center", justifyContent: "center" }}><IconPill size={30} color="var(--teal-300)" /></div>
                         )}
                       </div>
-                      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 9 }}>
+                      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 7 }}>
                         <span style={{ fontSize: 11, color: "var(--teal-600)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>บทความ</span>
-                        <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 17, color: "var(--neutral-900)", margin: 0, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{a.title}</h3>
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12.5, color: "var(--neutral-400)" }}><IconClock size={13} color="currentColor" /> {a.read_time_min ?? 5} นาที</span>
+                        <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15.5, color: "var(--neutral-900)", margin: 0, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{a.title}</h3>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--neutral-400)" }}><IconClock size={12} color="currentColor" /> {a.read_time_min ?? 5} นาที</span>
                       </div>
                     </article>
                   </Link>
