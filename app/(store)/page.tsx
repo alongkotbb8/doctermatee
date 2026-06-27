@@ -236,21 +236,22 @@ export default async function HomePage() {
                 </article>
               </Link>
 
-              {/* รายการขวา */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {/* รายการขวา — ภาพไม่ครอป สเกลจริง */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
                 {otherArticles.map((a, i) => (
                   <Link key={a.id} href={`/articles/${a.slug}`} className={`anim-fade-up d${Math.min(i + 2, 5)}`} style={{ textDecoration: "none" }}>
-                    <article className="card pcard-hover" style={{ display: "flex", alignItems: "stretch", gap: 16, padding: 14 }}>
-                      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "center", gap: 7 }}>
+                    <article className="card pcard-hover" style={{ display: "flex", alignItems: "center", gap: 16, padding: 16 }}>
+                      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 8 }}>
                         <span style={{ fontSize: 11, color: "var(--teal-600)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>บทความ</span>
-                        <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15.5, color: "var(--neutral-900)", margin: 0, lineHeight: 1.42, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{a.title}</h3>
+                        <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 16, color: "var(--neutral-900)", margin: 0, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{a.title}</h3>
                         <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--neutral-400)" }}><IconClock size={12} color="currentColor" /> {a.read_time_min ?? 5} นาที</span>
                       </div>
-                      <div style={{ width: 104, height: 104, borderRadius: 12, overflow: "hidden", flexShrink: 0, background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", position: "relative" }}>
+                      <div style={{ width: 150, flexShrink: 0, borderRadius: 12, overflow: "hidden", background: "var(--neutral-50)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                         {a.cover_image ? (
-                          <Image src={a.cover_image} alt={a.title} fill style={{ objectFit: "cover" }} sizes="104px" />
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={a.cover_image} alt={a.title} loading="lazy" style={{ width: "100%", height: "auto", display: "block" }} />
                         ) : (
-                          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><IconPill size={28} color="var(--teal-300)" /></div>
+                          <div style={{ width: "100%", aspectRatio: "16/9", display: "flex", alignItems: "center", justifyContent: "center" }}><IconPill size={28} color="var(--teal-300)" /></div>
                         )}
                       </div>
                     </article>
