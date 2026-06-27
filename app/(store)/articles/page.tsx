@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { IconArrowRight, IconClock, IconStar } from "@/components/icons";
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "บทความสุขภาพและอาหารเสริม",
