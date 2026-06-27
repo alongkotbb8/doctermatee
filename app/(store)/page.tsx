@@ -40,9 +40,9 @@ export default async function HomePage() {
   ]);
 
   const rawProducts = allProducts.slice(0, 9);
-  const articles: HomeArticle[] = allArticles.slice(0, 4);
+  const articles: HomeArticle[] = allArticles.slice(0, 3);
   const pinnedArticle = articles[0];
-  const otherArticles = articles.slice(1, 4);
+  const otherArticles = articles.slice(1, 3);
 
   const config = (settings.homepage_config ?? {}) as HomepageConfig;
   // hero ทั้งหมด (ข้อความ + รูป) อ่านจาก site_settings key="hero" เพื่อให้หน้า "แบนเนอร์" หลังบ้านคุมได้
@@ -222,7 +222,7 @@ export default async function HomePage() {
                     ) : (
                       <div style={{ aspectRatio: "16/9", background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", display: "flex", alignItems: "center", justifyContent: "center" }}><IconFlask size={64} color="var(--teal-300)" /></div>
                     )}
-                    <span style={{ position: "absolute", top: 16, left: 16, background: "var(--teal-600)", color: "#fff", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 12, padding: "5px 14px", borderRadius: "var(--radius-full)" }}>★ บทความแนะนำ</span>
+                    <span style={{ position: "absolute", top: 16, left: 16, background: "var(--glass-bg)", border: "1px solid var(--glass-border)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", color: "var(--teal-800)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 12, padding: "7px 14px", borderRadius: "var(--radius-full)", boxShadow: "var(--shadow-md)", display: "inline-flex", alignItems: "center", gap: 5 }}><IconStar size={13} color="var(--teal-600)" /> บทความแนะนำ</span>
                   </div>
                   <div style={{ padding: "22px 24px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--neutral-400)", fontSize: 12.5, marginBottom: 10 }}>

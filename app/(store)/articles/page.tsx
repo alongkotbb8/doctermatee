@@ -1,7 +1,7 @@
 import { getPublishedArticles, type HomeArticle } from "@/lib/data";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { IconArrowRight, IconClock } from "@/components/icons";
+import { IconArrowRight, IconClock, IconStar } from "@/components/icons";
 
 export const revalidate = 0;
 
@@ -46,8 +46,8 @@ export default async function ArticlesPage() {
                         </div>
                       )}
                       {i === 0 && (
-                        <span style={{ position: "absolute", top: 14, left: 14, background: "var(--teal-600)", color: "#fff", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 12, padding: "5px 14px", borderRadius: "var(--radius-full)" }}>
-                          ★ บทความแนะนำ
+                        <span style={{ position: "absolute", top: 14, left: 14, background: "var(--glass-bg)", border: "1px solid var(--glass-border)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", color: "var(--teal-800)", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 12, padding: "7px 14px", borderRadius: "var(--radius-full)", boxShadow: "var(--shadow-md)", display: "inline-flex", alignItems: "center", gap: 5 }}>
+                          <IconStar size={13} color="var(--teal-600)" /> บทความแนะนำ
                         </span>
                       )}
                     </div>
