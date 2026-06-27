@@ -504,22 +504,9 @@ details summary::-webkit-details-marker { display: none; }
   .articles-grid { grid-template-columns: 1fr !important; }
 }
 
-/* home articles grid: 4 → 2 → scroll */
-@media (max-width: 1024px) {
-  .home-articles-grid { grid-template-columns: repeat(2,1fr) !important; }
-}
-@media (max-width: 560px) {
-  .home-articles-grid {
-    grid-auto-flow: column !important;
-    grid-template-columns: none !important;
-    grid-auto-columns: 78% !important;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    margin: 0 -20px; padding: 4px 20px 12px;
-  }
-  .home-articles-grid > a { scroll-snap-align: start; }
-  .home-articles-grid::-webkit-scrollbar { display: none; }
+/* home articles magazine: เด่นซ้าย + รายการขวา → ซ้อนกันบนจอเล็ก */
+@media (max-width: 860px) {
+  .home-articles-mag { grid-template-columns: 1fr !important; }
 }
 
 /* Article body typography */
