@@ -45,12 +45,18 @@ export default function Navbar() {
     <header
       style={{
         position: "sticky", top: 0, zIndex: 40,
-        background: scrolled ? "rgba(255,255,255,0.38)" : "rgba(255,255,255,0.72)",
-        WebkitBackdropFilter: scrolled ? "saturate(220%) blur(32px)" : "saturate(180%) blur(18px)",
-        backdropFilter: scrolled ? "saturate(220%) blur(32px)" : "saturate(180%) blur(18px)",
-        borderBottom: scrolled ? "1px solid rgba(13,148,136,0.1)" : "1px solid rgba(255,255,255,0.4)",
-        boxShadow: scrolled ? "0 8px 32px -12px rgba(13,148,136,0.18)" : "none",
-        transition: "background .3s var(--ease), backdrop-filter .3s var(--ease), box-shadow .3s var(--ease)",
+        // เลนส์นูน: ไล่เฉดจากใสด้านบน → ขุ่นด้านล่าง สร้างมิติโค้ง
+        background: scrolled
+          ? "linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.28) 55%, rgba(255,255,255,0.40) 100%)"
+          : "linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.66) 100%)",
+        WebkitBackdropFilter: scrolled ? "saturate(240%) blur(40px)" : "saturate(180%) blur(18px)",
+        backdropFilter: scrolled ? "saturate(240%) blur(40px)" : "saturate(180%) blur(18px)",
+        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.5)" : "1px solid rgba(255,255,255,0.4)",
+        // เลนส์นูน: ขอบบนสว่าง (แสงตกกระทบ) + ขอบล่างเงาเข้ม + เงาลอยด้านนอก
+        boxShadow: scrolled
+          ? "inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(13,148,136,0.08), 0 10px 40px -12px rgba(13,148,136,0.22)"
+          : "inset 0 1px 0 rgba(255,255,255,0.6)",
+        transition: "background .4s var(--ease), backdrop-filter .4s var(--ease), box-shadow .4s var(--ease), border-color .4s var(--ease)",
       }}
     >
       <div className="wrap nav-bar" style={{ display: "flex", alignItems: "center", gap: 16, height: 68 }}>
@@ -62,11 +68,11 @@ export default function Navbar() {
             {open ? <IconX size={20} color="currentColor" /> : <IconMenu size={20} color="currentColor" />}
           </button>
           <button
-            onClick={() => { router.push("/"); router.refresh(); }}
+            onClick={() => { window.location.href = "/"; }}
             aria-label="หน้าแรก"
             style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex" }}
           >
-            <Logo size={40} iconOnly />
+            <Logo size={40} iconOnly href={null} />
           </button>
         </div>
 

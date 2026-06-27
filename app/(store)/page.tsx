@@ -42,7 +42,6 @@ export default async function HomePage() {
   const rawProducts = allProducts.slice(0, 9);
   const articles: HomeArticle[] = allArticles.slice(0, 4);
   const pinnedArticle = articles[0];
-  const otherArticles = articles.slice(1, 4);
 
   const config = (settings.homepage_config ?? {}) as HomepageConfig;
   // hero ทั้งหมด (ข้อความ + รูป) อ่านจาก site_settings key="hero" เพื่อให้หน้า "แบนเนอร์" หลังบ้านคุมได้
@@ -209,52 +208,31 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            {/* Featured ซ้าย + รายการขวา (แบบหน้าบทความ) */}
-            <div className="grid-12" style={{ gap: 28, alignItems: "stretch" }}>
-              {/* Featured ใหญ่ */}
-              <Link href={`/articles/${pinnedArticle.slug}`} className="col-7 anim-fade-up" style={{ textDecoration: "none" }}>
-                <article className="pcard-hover card" style={{ overflow: "hidden", height: "100%", display: "flex", flexDirection: "column" }}>
-                  <div style={{ aspectRatio: "16 / 9", background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", position: "relative" }}>
-                    {pinnedArticle.cover_image ? (
-                      <Image src={pinnedArticle.cover_image} alt={pinnedArticle.title} fill style={{ objectFit: "cover" }} sizes="(max-width:768px) 100vw, 700px" />
-                    ) : (
-                      <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><IconFlask size={64} color="var(--teal-300)" /></div>
-                    )}
-                    <span style={{ position: "absolute", top: 16, left: 16, background: "var(--teal-600)", color: "#fff", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 12, padding: "5px 14px", borderRadius: "var(--radius-full)" }}>★ บทความแนะนำ</span>
-                  </div>
-                  <div style={{ padding: "24px 26px" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--neutral-400)", fontSize: 12.5, marginBottom: 12 }}>
-                      <IconClock size={13} color="currentColor" /> {pinnedArticle.read_time_min ?? 5} นาที
-                      {pinnedArticle.published_at && <span>· {new Date(pinnedArticle.published_at).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" })}</span>}
+            {/* การ์ดภาพเต็ม แถวเดียว สอดคล้องกับหน้า /articles */}
+            <div className="home-articles-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 24 }}>
+              {articles.map((a, i) => (
+                <Link key={a.id} href={`/articles/${a.slug}`} className={`anim-fade-up d${Math.min(i + 1, 5)}`} style={{ textDecoration: "none" }}>
+                  <article className="card pcard-hover" style={{ overflow: "hidden", display: "flex", flexDirection: "column", height: "100%" }}>
+                    <div style={{ aspectRatio: "16/9", background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", position: "relative", flexShrink: 0 }}>
+                      {a.cover_image ? (
+                        <Image src={a.cover_image} alt={a.title} fill style={{ objectFit: "cover" }} sizes="(max-width:768px) 80vw, 25vw" />
+                      ) : (
+                        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><IconFlask size={44} color="var(--teal-300)" /></div>
+                      )}
+                      {i === 0 && (
+                        <span style={{ position: "absolute", top: 12, left: 12, background: "var(--teal-600)", color: "#fff", fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 11, padding: "4px 12px", borderRadius: "var(--radius-full)" }}>★ บทความแนะนำ</span>
+                      )}
                     </div>
-                    <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: 24, lineHeight: 1.3, color: "var(--neutral-900)", margin: "0 0 12px", letterSpacing: "-.01em" }}>{pinnedArticle.title}</h3>
-                    {pinnedArticle.excerpt && <p style={{ fontSize: 14.5, color: "var(--neutral-500)", lineHeight: 1.8, margin: "0 0 16px" }}>{pinnedArticle.excerpt}</p>}
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--teal-600)", fontSize: 14, fontWeight: 600 }}>อ่านบทความ <IconArrowRight size={14} color="var(--teal-600)" /></span>
-                  </div>
-                </article>
-              </Link>
-
-              {/* รายการขวา — ยืดเต็มความสูงให้พอดีกับการ์ดเด่น */}
-              <div className="col-5" style={{ display: "flex", flexDirection: "column", gap: 16, height: "100%" }}>
-                {otherArticles.map((a, i) => (
-                  <Link key={a.id} href={`/articles/${a.slug}`} className={`anim-fade-up d${Math.min(i + 1, 5)}`} style={{ textDecoration: "none", flex: 1, display: "block" }}>
-                    <article className="card pcard-hover" style={{ display: "flex", gap: 14, padding: 12, height: "100%", transition: "box-shadow .2s, transform .2s" }}>
-                      <div style={{ width: 128, borderRadius: 10, overflow: "hidden", flexShrink: 0, background: "linear-gradient(145deg,var(--green-50),var(--teal-50))", position: "relative", minHeight: 92 }}>
-                        {a.cover_image ? (
-                          <Image src={a.cover_image} alt={a.title} fill style={{ objectFit: "cover" }} sizes="128px" />
-                        ) : (
-                          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><IconPill size={28} color="var(--teal-300)" /></div>
-                        )}
+                    <div style={{ padding: "16px 18px", flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--neutral-400)", fontSize: 12 }}>
+                        <IconClock size={12} color="currentColor" /> {a.read_time_min ?? 5} นาที
                       </div>
-                      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                        <span style={{ fontSize: 11, color: "var(--teal-600)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".04em", marginBottom: 4 }}>บทความ</span>
-                        <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14.5, color: "var(--neutral-900)", margin: "0 0 6px", lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{a.title}</h3>
-                        <span style={{ fontSize: 12, color: "var(--neutral-400)" }}>{a.read_time_min ?? 5} นาที</span>
-                      </div>
-                    </article>
-                  </Link>
-                ))}
-              </div>
+                      <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 15, lineHeight: 1.4, color: "var(--neutral-900)", margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{a.title}</h3>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, color: "var(--teal-600)", fontSize: 13, fontWeight: 600, marginTop: "auto" }}>อ่านบทความ <IconArrowRight size={13} color="var(--teal-600)" /></span>
+                    </div>
+                  </article>
+                </Link>
+              ))}
             </div>
           </div>
         </section>
